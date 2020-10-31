@@ -156,7 +156,7 @@
             Seriport bağlantı durum mesajı.
             </summary>
         </member>
-        <member name="M:Optoel.Optoel.Ble.Open(System.String)">
+        <member name="M:Optoel.Optoel.Ble.OpenAsync(System.String)">
             <summary>
             Seriportu açar. (BaudRade: 921600)
             </summary>
