@@ -1,0 +1,521 @@
+
+//***** UART Functions (begin) *****
+
+
+dim UEnable : UEnable = FALSE
+function HandlerUartRx()
+	dim strLength, nExitInfo
+	dim str$, SendData$
+	dim temp, temp1, temp2, rc
+	SendData$ = ""
+	
+	strLength = UartRead(str$)
+	
+	if StrCmp(str$, "Hi") == 0 then
+		SendData$ = "Hi"
+		rc=UartWrite(SendData$)
+		UEnable = TRUE
+		
+	elseif StrCmp(str$, "Close") == 0 then
+		SendData$ = "Close"
+		rc = UartWrite(SendData$)
+		UEnable = FALSE
+		
+	elseif StrCmp(str$, "IsReady") == 0 then
+		rc=BleEncode8(SendData$, 0x00, 1)	// Response [1]
+		rc=BleEncode8(SendData$, 0x00, 2)	// IsReady [2]
+		
+		if AccelReady == true then
+			rc=BleEncode8(SendData$, 0x01, 3)	// Accel [3]
+			rc=BleEncode8(SendData$, 0x01, 4)	// Ready [4]
+			rc=BleEncode8(SendData$, AccelSelfTestResult, 5)	// AccelSlfTest [5]
+		else
+			rc=BleEncode8(SendData$, 0x01, 3)	// Accel [3]
+			rc=BleEncode8(SendData$, 0x00, 4)	// Not ready [4]
+			rc=BleEncode8(SendData$, 0xFF, 5) 	// [5]
+		endif
+		
+		if GyroReady == true then
+			rc=BleEncode8(SendData$, 0x02, 6)	// Gyro [6]
+			rc=BleEncode8(SendData$, 0x01, 7)	// Ready [7]
+			rc=BleEncode8(SendData$, GyroSelfTestResult, 8)	// GyroSelfTest [8]
+		else
+			rc=BleEncode8(SendData$, 0x02, 6)	// Gyro [6]
+			rc=BleEncode8(SendData$, 0x00, 7)	// Not ready [7]
+			rc=BleEncode8(SendData$, 0xFF, 8) 	// [8]
+		endif
+		
+		if MagnoReady == true then
+			rc=BleEncode8(SendData$, 0x04, 9)	// Magno [9]
+			rc=BleEncode8(SendData$, 0x01, 10)	// Ready [10]
+			rc=BleEncode8(SendData$, MagnoSelfTestResult, 11)	// MagnoSelfTest [11]
+		else
+			rc=BleEncode8(SendData$, 0x04, 9)	// Magno [9]
+			rc=BleEncode8(SendData$, 0x00, 10)	// Not ready 10]
+			rc=BleEncode8(SendData$, 0xFF, 11)	// [11]
+		endif
+		rc=BleEncode8(SendData$, StrLen(SendData$), 0) // Data Length [0]
+		rc = UartWrite(SendData$)
+		
+	elseif StrCmp(str$, "ok") == 0 then
+		UartOk = true
+			
+	endif
+	
+	
+	if(UEnable == TRUE) then
+	
+		if StrGetChr(str$, 0) == 0x01 then	//******************** Enable/Disable ****************
+			if StrGetChr(str$, 1) == 0x01 then	//================ Accel
+				if StrGetChr(str$, 2) == 0x01 then		// Enable
+					
+					rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+					rc=BleEncode8(SendData$, 0x00, 1)	// Response
+					rc=BleEncode8(SendData$, 0x01, 2)	// Enable/Disable
+					rc=BleEncode8(SendData$, 0x01, 3)	// Accel
+					
+					if AccelEnable == false then
+						temp = ACC_init()
+					
+						if temp == true then
+							rc=BleEncode8(SendData$, 0x01, 4)	// Success
+							AccelEnable = true
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+					rc = UartWrite(SendData$)
+					
+				elseif StrGetChr(str$, 2) == 0x02 then	//Disable
+				
+					rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+					rc=BleEncode8(SendData$, 0x00, 1)	// Response
+					rc=BleEncode8(SendData$, 0x01, 2)	// Enable/Disable
+					rc=BleEncode8(SendData$, 0x01, 3)	// Accel
+					
+					if AccelEnable == true then
+						AccSetOperationMode(AccDeep_Suspend_Mode)
+						delay_ms(1)
+						temp = bmx_accel_readByte(ACC_PMU_LPW_ADDR)
+						
+						if temp == 0xFF then
+							rc=BleEncode8(SendData$, 0x02, 4)	// Success
+							AccelEnable = false
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+					rc = UartWrite(SendData$)
+					
+				endif
+				
+			elseif StrGetChr(str$, 1) == 0x02 then	//============= Gyro
+				if StrGetChr(str$, 2) == 0x01 then		// Enable
+					
+					rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+					rc=BleEncode8(SendData$, 0x00, 1)	// Response
+					rc=BleEncode8(SendData$, 0x01, 2)	// Enable/Disable
+					rc=BleEncode8(SendData$, 0x02, 3)	// Gyro
+					
+					if GyroEnable == false then
+						temp = GYRO_init()
+						
+						if temp == true then
+							rc=BleEncode8(SendData$, 0x01, 4)	// Success
+							GyroEnable = true
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+					rc = UartWrite(SendData$)
+					
+				elseif StrGetChr(str$, 2) == 0x02 then	// Disable
+					
+					rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+					rc=BleEncode8(SendData$, 0x00, 1)	// Response
+					rc=BleEncode8(SendData$, 0x01, 2)	// Enable/Disable
+					rc=BleEncode8(SendData$, 0x02, 3)	// Gyro
+					
+					if GyroEnable == true then
+						GyroSetOperationMode(GyroDeepSuspend_Mode)
+						delay_ms(1)
+						temp = bmx_gyro_readByte(GYRO_LPM1_ADDR)
+
+						if (temp & 0x20) == 0x20 then
+							rc=BleEncode8(SendData$, 0x02, 4)	// Success
+							GyroEnable = false
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+					rc = UartWrite(SendData$)
+					
+				endif
+				
+			elseif StrGetChr(str$, 1) == 0x04 then	//============= Magno
+				if StrGetChr(str$, 2) == 0x01 then		// Enable
+					
+					rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+					rc=BleEncode8(SendData$, 0x00, 1)	// Response
+					rc=BleEncode8(SendData$, 0x01, 2)	// Enable/Disable
+					rc=BleEncode8(SendData$, 0x04, 3)	// Magno
+					
+					if MagnoEnable == false then
+						temp = MAGNO_init()
+						
+						if temp == true then
+							rc=BleEncode8(SendData$, 0x01, 4)	// Success
+							MagnoEnable = true
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+					rc = UartWrite(SendData$)
+					
+				elseif StrGetChr(str$, 2) == 0x02 then	// Disable
+					
+					rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+					rc=BleEncode8(SendData$, 0x00, 1)	// Response
+					rc=BleEncode8(SendData$, 0x01, 2)	// Enable/Disable
+					rc=BleEncode8(SendData$, 0x04, 3)	// Magno
+					
+					if MagnoEnable == true then
+						MagSetOperationMode(MagnoSuspendMode)
+						delay_ms(1)
+						temp = bmx_magno_readByte(MAGNO_0x4B_ADDR)
+						
+						if temp == 0x00 then
+							rc=BleEncode8(SendData$, 0x02, 4)	// Success
+							MagnoEnable = false
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+					rc = UartWrite(SendData$)
+					
+				endif	
+			endif
+		
+		elseif StrGetChr(str$, 0) == 0x02 then	//********************* Bw *************************
+			dim bw
+			if StrGetChr(str$, 1) == 0x01 then		//=============== Accel
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x02, 2)	// Bw
+				rc=BleEncode8(SendData$, 0x01, 3)	// Accel
+				
+				if AccelEnable == true then
+					bw = StrGetChr(str$, 2)
+					AccSetPmuBw(bw)
+					
+					if AccGetPmuBw() == bw then
+						rc=BleEncode8(SendData$, 0x01, 4)	// Success
+						rc=BleEncode8(SendData$, bw,   5)	// bw value
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+				else
+					rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+				endif
+				rc=BleEncode8(SendData$, StrLen(SendData$), 0)	// Data Length
+				rc = UartWrite(SendData$)
+				
+			elseif StrGetChr(str$, 1) == 0x02 then	//=============== Gyro
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x02, 2)	// Bw
+				rc=BleEncode8(SendData$, 0x02, 3)	// Gyro
+				
+				if GyroEnable == true then
+					bw = StrGetChr(str$, 2)
+					GyroSetBw(bw)
+					
+					if GyroGetBw() == bw then
+						rc=BleEncode8(SendData$, 0x01, 4)	// Success
+						rc=BleEncode8(SendData$, bw,   5)	// bw value
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+				else
+					rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+				endif
+				rc=BleEncode8(SendData$, StrLen(SendData$), 0)	// Data Length				
+				rc = UartWrite(SendData$)
+					
+			elseif StrGetChr(str$, 1) == 0x04 then	//============== Magno
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x02, 2)	// Bw
+				rc=BleEncode8(SendData$, 0x04, 3)	// Magno
+				
+				if MagnoEnable == true then
+					bw = StrGetChr(str$, 2)
+					MagnoDataRateSet(bw)
+					
+					if MagnoDataRateGet() == bw then
+						rc=BleEncode8(SendData$, 0x01, 4)	// Success
+						rc=BleEncode8(SendData$, bw,   5)	// bw value
+					else
+						rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+					endif
+				else
+					rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+				endif
+				rc=BleEncode8(SendData$, StrLen(SendData$), 0)	// Data Length
+				rc = UartWrite(SendData$)
+			endif
+			
+		elseif StrGetChr(str$, 0) == 0x03 then	//************************* Range ****************************
+			dim range
+			if StrGetChr(str$, 1) == 0x01 then		//============ Accel
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x03, 2)	// Range
+				rc=BleEncode8(SendData$, 0x01, 3)	// Accel
+				
+				if AccelEnable == true then
+					range = StrGetChr(str$, 2)
+					AccSetPmuRange(range)
+					
+					if AccGetPmuRange() == range then
+						rc=BleEncode8(SendData$, 0x01,  4)	// Success
+						rc=BleEncode8(SendData$, range, 5)	// range value
+					else
+						rc=BleEncode8(SendData$, 0x00,  4)	// Fail
+					endif
+				else
+					rc=BleEncode8(SendData$, 0x00,  4)	// Fail
+				endif
+				rc=BleEncode8(SendData$, StrLen(SendData$), 0)	// Data Length				
+				rc = UartWrite(SendData$)
+				
+			elseif StrGetChr(str$, 1) == 0x02 then	//============ Gyro
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x03, 2)	// Range
+				rc=BleEncode8(SendData$, 0x02, 3)	// Gyro
+				
+				if GyroEnable == true then
+					range = StrGetChr(str$, 2)
+					GyroSetRange(range)
+
+					if GyroGetRange() == range then
+						rc=BleEncode8(SendData$, 0x01,  4)	// Success
+						rc=BleEncode8(SendData$, range, 5)	// range value
+					else
+						rc=BleEncode8(SendData$, 0x00,  4)	// Fail
+					endif
+				else
+					rc=BleEncode8(SendData$, 0x00,  4)	// Fail
+				endif
+				rc=BleEncode8(SendData$, StrLen(SendData$), 0)	// Data Length
+				rc = UartWrite(SendData$)	
+			endif
+			
+		elseif StrGetChr(str$, 0) == 0x04 then	//*********************** Read Enable ***************************
+			
+			if StrGetChr(str$, 1) == 0x01 then		//=============== Accel	
+				rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x04, 2)	// Read Enable
+				rc=BleEncode8(SendData$, 0x01, 3)	// Accel
+				
+				if AccelEnable == true then
+					if StrGetChr(str$, 2) == 0x01 then		// Enable
+						AccSetOperationMode(AccLow_Power_Mode2)
+						delay_ms(1)
+						temp1 = bmx_accel_readByte(ACC_PMU_LOW_POWER_ADDR)
+						temp2 = bmx_accel_readByte(ACC_PMU_LPW_ADDR)
+						
+						if (temp1 == 0x40) && (temp2 == 0x40) then
+							rc=BleEncode8(SendData$, 0x01, 4)	// Success
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+						
+					elseif StrGetChr(str$, 2) == 0x02 then	// Disable
+						AccSetOperationMode(AccStandby_Mode)
+						
+						temp1 = bmx_accel_readByte(ACC_PMU_LOW_POWER_ADDR)
+						temp2 = bmx_accel_readByte(ACC_PMU_LPW_ADDR)
+						
+						if (temp1 == 0x40) && (temp2 == 0x80) then
+							rc=BleEncode8(SendData$, 0x02, 4)	// Success
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+						
+					endif
+				else
+					rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+				endif
+				rc = UartWrite(SendData$)
+			
+			elseif StrGetChr(str$, 1) == 0x02 then	//================ Gyro
+				rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x04, 2)	// Read Enable
+				rc=BleEncode8(SendData$, 0x02, 3)	// Gyro
+				
+				if GyroEnable == true then
+					if StrGetChr(str$, 2) == 0x01 then		// Enable
+						GyroSetOperationMode(GyroNormal_Mode)
+						delay_ms(1)
+						temp = bmx_gyro_readByte(GYRO_LPM1_ADDR)
+						
+						if (temp & 0xF0) == 0x00 then
+							rc=BleEncode8(SendData$, 0x01, 4)	// Success
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+					
+					elseif StrGetChr(str$, 2) == 0x02 then	// Disable
+						GyroSetOperationMode(GyroFastPowerUpMode)
+						delay_ms(1)
+						temp1 = bmx_gyro_readByte(GYRO_LPM1_ADDR)
+						temp2 = bmx_gyro_readByte(GYRO_LPM2_ADDR)
+						
+						if ((temp1 & 0x80 ) == 0x80) && ((temp2 & 0x80 ) == 0x80) then
+							rc=BleEncode8(SendData$, 0x02, 4)	// Success
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+						
+					endif
+				else
+					rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+				endif
+				rc = UartWrite(SendData$)
+				
+			elseif StrGetChr(str$, 1) == 0x04 then	//================= Magno
+				rc=BleEncode8(SendData$, 0x05, 0)	// Data Length
+				rc=BleEncode8(SendData$, 0x00, 1)	// Response
+				rc=BleEncode8(SendData$, 0x04, 2)	// Read Enable
+				rc=BleEncode8(SendData$, 0x04, 3)	// Magno
+				
+				if MagnoEnable == true then
+					if StrGetChr(str$, 2) == 0x01 then		// Enable
+						MagSetOperationMode(MagnoNormalMode)
+						delay_ms(1)
+						temp1 = bmx_magno_readByte(MAGNO_0x4B_ADDR)
+						temp2 = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+						
+						if (temp1 == 0x01) && ((temp2 & 0x06 ) == 0x00) then
+							rc=BleEncode8(SendData$, 0x01, 4)	// Success
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+						
+					elseif StrGetChr(str$, 2) == 0x02 then	// Disable
+						MagSetOperationMode(MagnoSleepMode)
+						delay_ms(1)
+						temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+						
+						if (temp & 0x06) == 0x6 then
+							rc=BleEncode8(SendData$, 0x02, 4)	// Success
+						else
+							rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+						endif
+						
+					endif	
+				else
+					rc=BleEncode8(SendData$, 0x00, 4)	// Fail
+				endif
+				rc = UartWrite(SendData$)
+			
+			endif
+			
+		elseif StrGetChr(str$, 0) == 0x05 then		// Start
+			
+			if (StrGetChr(str$, 1) == 0x01) && (AccelEnable == true) then
+				AccSetOperationMode(AccLow_Power_Mode2)
+				delay_ms(1)
+			endif
+			
+			if (StrGetChr(str$, 2) == 0x01) && (GyroEnable == true) then
+				GyroSetOperationMode(GyroNormal_Mode)
+				delay_ms(1)
+			endif
+			
+			if (StrGetChr(str$, 3) == 0x01) && (MagnoEnable == true) then
+				MagSetOperationMode(MagnoNormalMode)
+			endif
+			
+			TimerStart(2, 20, 1)
+			TimerStart(0, 10, 1)
+		elseif StrGetChr(str$, 0) == 0x06 then		// Stop
+		
+			if AccelEnable == true then
+				AccSetOperationMode(AccStandby_Mode)
+				delay_ms(1)
+			endif
+			
+			if GyroEnable == true then
+				GyroSetOperationMode(GyroFastPowerUpMode)
+				delay_ms(1)
+			endif
+			
+			if MagnoEnable == true then
+				MagSetOperationMode(MagnoSleepMode)
+			endif
+			
+		elseif StrGetChr(str$, 0) == 0x07 then		// ReGetData
+			rc = UartWrite(UartSendData$)
+		endif	
+	endif
+		
+endfunc 1
+
+
+function UART_Init()
+	dim rc, res : res = 1
+	
+	if UartInfo(0) == 1 then
+		UartClose()
+	endif
+	
+	rc = UartOpen(921600,0,0,"CN81N")
+	
+	if rc != 0 then
+		select rc
+			case 0x5208
+				//print "Invalid baudrate!\n"
+			case 0x5209
+				//print "Invalid parity!\n"
+			case 0x520A
+				//print "Invalid databits!\n"
+			case 0x520B
+				//print "Invalid stopbits!\n"
+			case 0x520C
+				//print "Cannot be DTE (because DCD and RI cannot be inputs)!\n"
+			case 0x520D
+				//print "Cannot be DCE (because DCD and RI cannot be outputs)!\n"
+			case 0x520E
+				//print "Invalid flow control request!\n"
+			case 0x520F
+				//print "Invalid DTE/DCE role request!\n"
+			case 0x5210
+				//print "Invalid length of stOptions parameter (must be five characters)!\n"
+			case 0x5211
+				//print "Invalid Tx buffer length!\n"
+			case 0x5212 
+				//print "Invalid Rx buffer length!\n"
+			case else
+		endselect
+		res = 1
+	else
+		OnEvent EVUARTRX call HandlerUartRx
+		res = 0
+	endif
+endfunc res
+
+//***** UART Functions (end) *******
+
+//OnEvent EVUARTRX call HandlerUartRx

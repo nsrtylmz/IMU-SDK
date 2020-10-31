@@ -1,0 +1,141 @@
+
+
+#include "$LIB$.Pins.sb"
+
+
+#define Spi_write_bit	0x00
+#define Spi_read_bit	0x80
+
+dim SPI_handle
+
+dim SpiAssertRCEnable
+SpiAssertRCEnable = false
+
+sub SpiAssertRC(byval rc as integer,byval tag as integer)
+	if SpiAssertRCEnable == TRUE then
+		if 1 && (rc!=0) then
+			print "Spi Failed with ";integer.h' rc;" at tag ";tag;"\n"
+		endif
+	endif
+endsub
+
+//***** Set Spi pins *****
+function Spi_Setting_Pins() as integer
+	dim rc, res : res = 0
+	
+	// rc=SetPinSIO(bmx_cs1, DIGITAL_OUT, Initial_Output_to_HIGH) 	: SpiAssertRC(rc, 26) : res = res | rc
+	// rc=SetPinSIO(bmx_cs2, DIGITAL_OUT, Initial_Output_to_HIGH) 	: SpiAssertRC(rc, 27) : res = res | rc
+	// rc=SetPinSIO(bmx_cs3, DIGITAL_OUT, Initial_Output_to_HIGH) 	: SpiAssertRC(rc, 28) : res = res | rc
+	
+	rc = GpioSetFunc(bmx_cs1, DIGITAL_OUT, Initial_Output_to_HIGH) 	//: SpiAssertRC(rc, 30) : res = res | rc
+	rc = GpioSetFunc(bmx_cs2, DIGITAL_OUT, Initial_Output_to_HIGH) 	//: SpiAssertRC(rc, 31) : res = res | rc
+	rc = GpioSetFunc(bmx_cs3, DIGITAL_OUT, Initial_Output_to_HIGH) 	//: SpiAssertRC(rc, 32) : res = res | rc
+endfunc res
+
+
+//***** Close the Spi *****
+// sub Spi_Close()
+	// SpiClose(SPI_handle)
+// endsub
+
+
+function Spi_Init() as integer
+	dim rc
+	
+	if Spi_Setting_Pins() == 0 then
+		
+		rc=SpiOpen(0, 4000000, 0, SPI_handle) 			: SpiAssertRC(rc, 42)
+		
+		select rc
+			case 0	
+				//DbgMsg("Spi is opened.")
+			case 0x5200
+				//DbgMsg("Spi driver not found.")
+			case 0x5207
+				//DbgMsg("Spi driver already open. Closing and restarting...")
+				// Spi_Close()
+				SpiClose(SPI_handle)
+				rc=SpiOpen(0, 4000000, 0, SPI_handle) 	: SpiAssertRC(rc, 42)
+				if rc == 0 then
+					DbgMsg("Spi is opened.")
+				endif
+			case 0x5225
+				//DbgMsg("Spi invalid clock frequency requested.")
+			case 0x521D
+				//DbgMsg("Spi driver resource unavailable.")
+			case 0x522B
+				//DbgMsg("Spi invalid.")
+			case else
+		endselect
+	else
+		//DbgMsg("Spi pinleri ayarlanamadı!")
+	endif
+endfunc rc
+
+
+sub bmx_cs1_write(byval value as integer)
+	GpioWrite(bmx_cs1, value)
+endsub
+
+sub bmx_cs2_write(byval value as integer)
+	GpioWrite(bmx_cs2, value)
+endsub
+
+sub bmx_cs3_write(byval value as integer)
+	GpioWrite(bmx_cs3, value)
+endsub
+
+
+
+
+
+//***** Wrtie to Spi *****
+sub Spi_Write_Data(byval addr as integer, byval data as integer)
+	dim rc, wr$ : wr$=""
+	 
+	rc=BleEncode8(wr$, addr, 0)	: SpiAssertRC(rc, 87)
+	rc=BleEncode8(wr$, data, 1)	: SpiAssertRC(rc, 88)
+	
+	rc=SpiWrite(wr$) 			: SpiAssertRC(rc, 89)
+endsub
+
+
+//***** Read from the Spi *****
+sub Spi_Read_Data(byval addr as integer, byref rd$ as string, byval nReadLen as integer)
+	dim rc, wr$ : wr$=""
+	
+	rc=BleEncode8(wr$, addr | Spi_read_bit, 0)	: SpiAssertRC(rc, 98)
+	
+	rc=SpiWrite(wr$) 							: SpiAssertRC(rc, 100)
+	rc=SpiRead(rd$, nReadLen) 					: SpiAssertRC(rc, 102)
+endsub
+
+
+
+function Spi_WriteRead(byval addr as integer, byref rd$ as string) as integer
+	dim rc, res : res = 0
+	dim wr$ : wr$=""
+	
+	rc=BleEncode8(wr$, addr | Spi_read_bit, 0)	: SpiAssertRC(rc, 98) : res = res | rc
+	rc=SpiReadWrite(wr$,rd$)
+endfunc res
+
+
+
+
+
+function SpiFlashOpen()
+	dim rc, nTotalSize, nSectorSize
+	
+	rc = FlashOpen(nTotalSize,nSectorSize)
+	if rc == 0 then
+		//DbgMsg("Flash Memory is ready.")
+	else
+		//DbgMsg("Flash Memory failed to initialize!")
+		SpiAssertRC(rc, 131)
+	endif
+endfunc rc
+
+
+
+

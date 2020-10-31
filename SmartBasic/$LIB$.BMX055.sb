@@ -1,0 +1,1430 @@
+
+#include "$LIB$.Spi.sb"
+
+
+
+dim BMXAssertRCEnable
+dim BMXResultEnable
+
+
+//****************************************************
+//      BMX055 Register Address (Begin)
+//****************************************************
+
+//***** ACCEL REGISTER ADRESS (Begin)*****
+#define ACC_CHIP_ID_ADDR		0x00
+#define ACC_X_LSB_ADDR			0x02
+#define ACC_X_MSB_ADDR			0x03
+#define ACC_Y_LSB_ADDR			0x04
+#define ACC_Y_MSB_ADDR			0x05
+#define ACC_Z_LSB_ADDR			0x06
+#define ACC_Z_MSB_ADDR			0x07
+
+#define ACC_TEMP_ADDR			0x08
+
+#define ACC_INT_STATUS_0_ADDR	0x09
+#define ACC_INT_STATUS_1_ADDR	0x0A
+#define ACC_INT_STATUS_2_ADDR	0x0B
+#define ACC_INT_STATUS_3_ADDR	0x0C
+
+#define ACC_FIFO_STATUS_ADDR	0x0E
+
+#define ACC_PMU_RANGE_ADDR		0x0F
+#define ACC_PMU_BW_ADDR			0x10
+#define ACC_PMU_LPW_ADDR		0x11
+#define ACC_PMU_LOW_POWER_ADDR	0x12
+#define ACC_ACCD_HBW_ADDR		0x13
+#define ACC_BGW_SOFTRESET_ADDR	0x14
+
+#define ACC_INT_EN0ADDR			0x16
+#define ACC_INT_EN1ADDR			0x17
+#define ACC_INT_EN2ADDR			0x18
+
+#define ACC_INT_MAP0ADDR		0x19
+#define ACC_INT_MAP1ADDR		0x1A
+#define ACC_INT_MAP2ADDR		0x1B
+
+#define ACC_INT_SRC_ADDR		0x1E
+#define ACC_INT_OUT_CTRL_ADDR	0x20
+#define ACC_INT_RST_LATCH_ADDR 	0x21
+
+#define ACC_INT_0_ADDR			0x22
+#define ACC_INT_1_ADDR			0x23
+#define ACC_INT_2_ADDR			0x24
+#define ACC_INT_3_ADDR			0x25
+#define ACC_INT_4_ADDR			0x26
+#define ACC_INT_5_ADDR			0x27
+#define ACC_INT_6_ADDR			0x28
+#define ACC_INT_7_ADDR			0x29
+#define ACC_INT_8_ADDR			0x2A
+#define ACC_INT_9_ADDR			0x2B
+#define ACC_INT_A_ADDR			0x2C
+#define ACC_INT_B_ADDR			0x2D
+#define ACC_INT_C_ADDR			0x2E
+#define ACC_INT_D_ADDR			0x2F
+
+#define ACC_FIFO_CONFIG_0_ADDR	0x30
+#define ACC_PMU_SELF_TEST_ADDR	0x32
+#define ACC_TRIM_NVM_CTRL_ADDR	0x33
+#define ACC_BGW_SPI3_WDT_ADDR	0x34
+
+#define ACC_OFC_CTRL_ADDR		0x36
+#define ACC_OFC_SETTING_ADDR	0x37
+#define ACC_OFC_OFFSET_X_ADDR	0x38
+#define ACC_OFC_OFFSET_Y_ADDR	0x39
+#define ACC_OFC_OFFSET_Z_ADDR	0x3A
+
+#define ACC_TRIM_GP0_ADDR		0x3B
+#define ACC_TRIM_GP1_ADDR		0x3C
+
+#define ACC_FIFO_CONFIG_1_ADDR	0x3E
+#define ACC_FIFO_DATA_ADDR		0x3F
+
+
+
+
+#define	Range_2g	0x03
+#define	Range_4g	0x05
+#define	Range_8g	0x08
+#define	Range_16g	0x0C
+
+
+#define AccelBW_7f81Hz		0x08	// 7.81 Hz 		64 ms
+#define AccelBW_15f63Hz		0x09	// 15.63 Hz		32 ms
+#define AccelBW_31f25Hz		0x0A	// 31.25 Hz		16 ms
+#define AccelBW_62f5Hz		0x0B	// 62.5 Hz		8 ms
+#define AccelBW_125Hz		0x0C	// 125 Hz		4 ms
+#define AccelBW_250Hz		0x0D	// 250 Hz		2 ms
+#define AccelBW_500Hz		0x0E	// 500 Hz		1 ms
+#define AccelBW_1000Hz		0x0F	// 1000 Hz		0.5 ms
+
+
+// Accel Operation Modes
+#define AccNormal_Mode			0x00
+#define AccDeep_Suspend_Mode	0x01
+#define AccSuspend_Mode			0x02
+#define AccStandby_Mode			0x03
+#define AccLow_Power_Mode1		0x04
+#define AccLow_Power_Mode2		0x05
+
+
+AccOperationMode = 0
+
+//***** ACCEL REGISTER ADRESS (End)*****
+
+
+
+
+//***** GYRO REGISTER ADRESS (Begin)*****
+#define GYRO_Chip_ID_ADDR				0x00
+
+#define GYRO_RATE_X_LSB_ADDR			0x02
+#define GYRO_RATE_X_MSB_ADDR			0x03
+#define GYRO_RATE_Y_LSB_ADDR			0x04
+#define GYRO_RATE_Y_MSB_ADDR			0x05
+#define GYRO_RATE_Z_LSB_ADDR			0x06
+#define GYRO_RATE_Z_MSB_ADDR			0x07
+
+
+#define GYRO_INT_STATUS_0_ADDR			0x09
+#define GYRO_INT_STATUS_1_ADDR			0x0A
+#define GYRO_INT_STATUS_2_ADDR			0x0B
+#define GYRO_INT_STATUS_3_ADDR			0x0C
+
+#define GYRO_FIFO_STATUS_ADDR			0x0E
+
+#define GYRO_RANGE_ADDR					0x0F
+#define GYRO_BW_ADDR					0x10
+#define GYRO_LPM1_ADDR					0x11
+#define GYRO_LPM2_ADDR					0x12
+#define GYRO_RATE_HBW_ADDR				0x13
+#define GYRO_BGW_SOFTRESET_ADDR			0x14
+
+#define GYRO_INT_EN_0_ADDR				0x15
+#define GYRO_INT_EN_1_ADDR				0x16
+#define GYRO_INT_MAP_0_ADDR				0x17
+#define GYRO_INT_MAP_1_ADDR				0x18
+#define GYRO_INT_MAP_2_ADDR				0x19
+
+#define GYRO_0x1A_ADDR					0x1A
+#define GYRO_0x1B_ADDR					0x1B
+
+
+#define GYRO_INT_RST_LATCH 				0x21
+
+#define GYRO_High_Th_x_ADDR				0x22
+#define GYRO_High_Dur_x_ADDR			0x23
+#define GYRO_High_Th_y_ADDR				0x24
+#define GYRO_High_Dur_y_ADDR			0x25
+#define GYRO_High_Th_z_ADDR				0x26
+#define GYRO_High_Dur_z_ADDR			0x27
+
+
+#define GYRO_SOC_ADDR					0x31
+#define GYRO_A_FOC_ADDR					0x32
+#define GYRO_GYRO_TRIM_NVM_CTRL_ADDR	0x33
+#define GYRO_BGW_SPI3_WDT_ADDR			0x34
+
+#define GYRO_OFC1_ADDR					0x36
+#define GYRO_OFC2_ADDR					0x37
+#define GYRO_OFC3_ADDR					0x38
+#define GYRO_OFC4_ADDR					0x39
+
+#define GYRO_TRIM_GP0_ADDR				0x3A
+#define GYRO_TRIM_GP1_ADDR				0x3B
+
+#define GYRO_BIST_ADDR					0x3C
+
+#define GYRO_FIFO_CONFIG_0_ADDR			0x3D
+#define GYRO_FIFO_CONFIG_1_ADDR			0x3E
+#define GYRO_FIFO_DATA_ADDR				0x3F
+
+
+
+#define	Range_2000s	0x00
+#define	Range_1000s	0x01
+#define	Range_500s	0x02
+#define	Range_250s	0x03
+#define	Range_125s	0x04
+
+
+#define GyroBW_32Hz		0x87 	// 32 Hz	ODR: 100 Hz
+#define GyroBW_64Hz		0x86	// 64 Hz	ODR: 200 Hz
+#define GyroBW_12Hz		0x85	// 12 Hz	ODR: 100 Hz
+#define GyroBW_23Hz		0x84	// 23 Hz	ODR: 200 Hz
+#define GyroBW_47Hz		0x83	// 47 Hz	ODR: 400 Hz
+#define GyroBW_116Hz	0x82	// 116 Hz	ODR: 1000 Hz
+#define GyroBW_230Hz	0x81	// 230 Hz	ODR: 2000 Hz
+#define GyroBW_523Hz	0x80	// 523 Hz	(Unfiltered)
+
+
+//Gyro Operation Modes
+#define GyroNormal_Mode			0x00
+#define GyroDeepSuspend_Mode	0x01
+#define GyroSuspend_Mode		0x02
+#define GyroFastPowerUpMode		0x03
+
+GyrOperationMode = GyroNormal_Mode
+
+//***** GYRO REGISTER ADRESS (End)*****
+
+
+
+
+
+//***** MAG REGISTER ADRESS (Begin)*****
+#define MAG_Chip_ID_ADDR				0x40
+
+#define MAGNO_DATA_X_LSB_ADDR			0x42
+#define MAGNO_DATA_X_MSB_ADDR			0x43
+#define MAGNO_DATA_Y_LSB_ADDR			0x44
+#define MAGNO_DATA_Y_MSB_ADDR			0x45
+#define MAGNO_DATA_Z_LSB_ADDR			0x46
+#define MAGNO_DATA_Z_MSB_ADDR			0x47
+#define MAGNO_DATA_RHALL_LSB_ADDR		0x48
+#define MAGNO_DATA_RHALL_MSB_ADDR		0x49
+
+#define MAGNO_0x4A_ADDR					0x4A
+#define MAGNO_0x4B_ADDR					0x4B
+#define MAGNO_0x4C_ADDR					0x4C
+#define MAGNO_0x4D_ADDR					0x4D
+#define MAGNO_0x4E_ADDR					0x4E
+#define MAGNO_0x4F_ADDR					0x4F
+#define MAGNO_0x50_ADDR					0x50
+#define MAGNO_0x51_ADDR					0x51
+#define MAGNO_0x52_ADDR					0x52
+
+//! @name TRIM REGISTERS   	*/
+// Trim Extended Registers 	*/
+#define MAGNO_DIG_X1_ADDR				0x5D
+#define MAGNO_DIG_Y1_ADDR				0x5E
+#define MAGNO_DIG_Z4_LSB_ADDR			0x62
+#define MAGNO_DIG_Z4_MSB_ADDR			0x63
+#define MAGNO_DIG_X2_ADDR				0x64
+#define MAGNO_DIG_Y2_ADDR				0x65
+#define MAGNO_DIG_Z2_LSB_ADDR			0x68
+#define MAGNO_DIG_Z2_MSB_ADDR			0x69
+#define MAGNO_DIG_Z1_LSB_ADDR			0x6A
+#define MAGNO_DIG_Z1_MSB_ADDR			0x6B
+#define MAGNO_DIG_XYZ1_LSB_ADDR			0x6C
+#define MAGNO_DIG_XYZ1_MSB_ADDR			0x6D
+#define MAGNO_DIG_Z3_LSB_ADDR			0x6E
+#define MAGNO_DIG_Z3_MSB_ADDR			0x6F
+#define MAGNO_DIG_XY2_ADDR				0x70
+#define MAGNO_DIG_XY1_ADDR				0x71
+
+
+//Magno Data Rate
+#define DataRate_2Hz		0x08
+#define DataRate_6Hz		0x10
+#define DataRate_8Hz		0x18
+#define DataRate_10Hz		0x00
+#define DataRate_15Hz		0x20
+#define DataRate_20Hz		0x28
+#define DataRate_25Hz		0x30
+#define DataRate_30Hz		0x38
+
+
+//Magno Operation Modes
+#define MagnoSuspendMode	0x00
+#define MagnoSleepMode		0x01
+#define MagnoNormalMode		0x02
+#define MagnoFarcedMode		0x03
+
+MagnoOperationMode = MagnoSuspendMode
+
+//Magno Active Mod Preset
+#define LowPowerPreset				0x00
+#define RegularPreset				0x01
+#define EnhancedRegularPreset		0x02
+#define HighAccuracyPreset			0x03
+
+//***** MAG REGISTER ADRESS (End) *****
+
+//****************************************************
+//      BMX055 Register Address (End)
+//****************************************************
+
+
+
+
+//****************************************************
+//      BMX055 Functions (Begin)
+//****************************************************
+
+BMXAssertRCEnable = false
+sub BMXAssertRC(byval rc as integer,byval tag as integer)
+	if BMXAssertRCEnable == TRUE then
+		if 1 && (rc!=0) then
+			print "BMX055 Failed with RC=";integer.h' rc;" at tag ";tag;"\n"
+		endif
+	endif
+endsub
+
+BMXResultEnable = true
+sub BMXResult(byval res, byval tag)
+	if BMXResultEnable == TRUE then
+		if res!=0 then
+			print "BMX055 Failed with Result=";integer.h' res;" at tag ";tag;"\n"
+		endif
+	endif
+endsub
+
+
+sub bmx_accel_write(byval addr as integer, byval data as integer)
+	bmx_cs2_write(HIGH)
+	bmx_cs3_write(HIGH)
+	
+	bmx_cs1_write(LOW)
+	Spi_Write_Data(addr, data)
+	bmx_cs1_write(HIGH)
+endsub
+
+sub bmx_accel_read(byval addr as integer, byref rd$ as string, byval nReadLen as integer)
+	bmx_cs2_write(HIGH)
+	bmx_cs3_write(HIGH)
+	
+	bmx_cs1_write(LOW)
+	Spi_Read_Data(addr, rd$, nReadLen)
+	bmx_cs1_write(HIGH)	
+endsub
+
+function bmx_accel_readByte(byval addr as integer)
+	dim temp, rd$
+	
+	bmx_cs2_write(HIGH)
+	bmx_cs3_write(HIGH)
+	
+	bmx_cs1_write(LOW)
+	Spi_Read_Data(addr, rd$, 1)
+	bmx_cs1_write(HIGH)
+	temp = StrGetChr(rd$, 0)
+endfunc temp
+
+
+
+sub bmx_gyro_write(byval addr as integer, byval data as integer)
+	bmx_cs1_write(HIGH)
+	bmx_cs3_write(HIGH)
+	
+	bmx_cs2_write(LOW)
+	Spi_Write_Data(addr, data)
+	bmx_cs2_write(HIGH)
+endsub
+
+sub bmx_gyro_read(byval addr as integer, byref rd$ as string, byval nReadLen as integer)
+	bmx_cs1_write(HIGH)
+	bmx_cs3_write(HIGH)
+	
+	bmx_cs2_write(LOW)
+	Spi_Read_Data(addr, rd$, nReadLen) :
+	bmx_cs2_write(HIGH)	
+endsub
+
+function bmx_gyro_readByte(byval addr as integer)
+	dim temp, rd$
+	
+	bmx_cs1_write(HIGH)
+	bmx_cs3_write(HIGH)
+	
+	bmx_cs2_write(LOW)
+	Spi_Read_Data(addr, rd$, 1)
+	bmx_cs2_write(HIGH)
+	temp = StrGetChr(rd$, 0)
+endfunc temp
+
+
+
+sub bmx_magno_write(byval addr as integer, byval data as integer)
+	bmx_cs1_write(HIGH)
+	bmx_cs2_write(HIGH)
+	
+	bmx_cs3_write(LOW)
+	Spi_Write_Data(addr, data)
+	bmx_cs3_write(HIGH)
+endsub
+
+sub bmx_magno_read(byval addr as integer, byref rd$ as string, byval nReadLen as integer)
+	bmx_cs1_write(HIGH)
+	bmx_cs2_write(HIGH)
+	
+	bmx_cs3_write(LOW)
+	Spi_Read_Data(addr, rd$, nReadLen)
+	bmx_cs3_write(HIGH)	
+endsub
+
+
+function bmx_magno_readByte(byval addr as integer)
+	dim temp, rd$
+	
+	bmx_cs1_write(HIGH)
+	bmx_cs2_write(HIGH)
+	
+	bmx_cs3_write(LOW)
+	Spi_Read_Data(addr, rd$, 1)
+	bmx_cs3_write(HIGH)
+	temp = StrGetChr(rd$, 0)
+endfunc temp
+
+
+
+//====================================================
+//      BMX055 Accel Functions (Begin)
+//====================================================
+
+function AccGetChipID()
+	dim temp
+	temp = bmx_accel_readByte(ACC_CHIP_ID_ADDR)
+endfunc temp
+
+
+//***** Acc g-Range set, get
+sub AccSetPmuRange(byval range as integer)
+	bmx_accel_write(ACC_PMU_RANGE_ADDR, range)
+endsub
+
+function AccGetPmuRange()
+	dim temp
+	temp = bmx_accel_readByte(ACC_PMU_RANGE_ADDR)
+endfunc temp
+
+
+//***** Acc g-Bandwidth set, get
+sub AccSetPmuBw(byval bandwidth as integer)
+	bmx_accel_write(ACC_PMU_BW_ADDR, bandwidth)
+	AccelBw = bandwidth
+endsub
+
+function AccGetPmuBw()
+	dim temp
+	temp = bmx_accel_readByte(ACC_PMU_BW_ADDR)		
+endfunc temp
+
+
+sub AccelSoftreset()
+	bmx_accel_write(ACC_BGW_SOFTRESET_ADDR, 0xB6)
+	delay_ms(5)
+	AccOperationMode = AccNormal_Mode
+endsub
+
+
+sub AccSetOperationMode(byval mode as integer)
+	dim temp, rd$
+	
+	AccOperationMode = mode
+	select mode
+		case AccNormal_Mode
+			AccelSoftreset()
+			
+		case AccDeep_Suspend_Mode
+			bmx_accel_write(ACC_PMU_LPW_ADDR, 0x20)
+			
+		case AccSuspend_Mode
+			bmx_accel_write(ACC_PMU_LOW_POWER_ADDR, 0x00)
+			bmx_accel_write(ACC_PMU_LPW_ADDR, 0x80)
+			
+		case AccStandby_Mode
+			bmx_accel_write(ACC_PMU_LOW_POWER_ADDR, 0x40)
+			bmx_accel_write(ACC_PMU_LPW_ADDR, 0x80)
+			
+		case AccLow_Power_Mode1
+			
+		case AccLow_Power_Mode2
+			bmx_accel_write(ACC_PMU_LOW_POWER_ADDR, 0x40)
+			bmx_accel_write(ACC_PMU_LPW_ADDR, 0x40)
+			
+		case else
+	endselect
+endsub
+
+function selfTest(byval addr as integer) as integer
+	dim rc
+	dim LSB, DecimalData, data$
+	
+	bmx_accel_read(addr, data$, 2)
+	LSB = StrGetChr(data$,0) & 0xF0
+	rc=BleEncode8(data$, LSB, 0)
+	
+	rc=BleDecodeS16(data$,DecimalData,0)
+	DecimalData = DecimalData / 16	
+endfunc DecimalData
+
+function AccSelfTest()
+	dim res, positiveData, negativeData
+	res = 0
+	
+	AccSetOperationMode(AccNormal_Mode)
+	delay_ms(2)
+	AccSetPmuRange(Range_8g)
+	delay_ms(2)
+	
+	bmx_accel_write(ACC_PMU_SELF_TEST_ADDR, 0x15)
+	delay_ms(50)
+	positivedata = selfTest(ACC_X_LSB_ADDR)
+	
+	bmx_accel_write(ACC_PMU_SELF_TEST_ADDR, 0x11)
+	delay_ms(50)
+	negativeData = selfTest(ACC_X_LSB_ADDR)
+	
+	if Abs((positiveData-negativeData) * 4) < 800 then
+		res = res | 0x01
+		//DbgMsg("AccelX Selftest'i geçemedi!")
+	endif
+	
+	
+	bmx_accel_write(ACC_PMU_SELF_TEST_ADDR, 0x16)
+	delay_ms(50)
+	positivedata = selfTest(ACC_Y_LSB_ADDR)
+	
+	bmx_accel_write(ACC_PMU_SELF_TEST_ADDR, 0x12)
+	delay_ms(50)
+	negativeData = selfTest(ACC_Y_LSB_ADDR)
+	
+	if Abs((positiveData-negativeData) * 4) < 800 then
+		res = res | 0x02
+		//DbgMsg("AccelY Selftest'i geçemedi!")
+	endif
+	
+	bmx_accel_write(ACC_PMU_SELF_TEST_ADDR, 0x17)
+	delay_ms(50)
+	positivedata = selfTest(ACC_Z_LSB_ADDR)
+	
+	bmx_accel_write(ACC_PMU_SELF_TEST_ADDR, 0x13)
+	delay_ms(50)
+	negativeData = selfTest(ACC_Z_LSB_ADDR)
+	
+	if Abs((positiveData-negativeData) * 4) < 600 then
+		res = res | 0x04
+		//DbgMsg("AccelZ Selftest'i geçemedi!")
+	endif
+endfunc res
+
+
+
+sub AccFastCompensation()
+	dim res, temp, rd$
+	
+	AccSetPmuRange(Range_2g)
+	bmx_accel_write(ACC_OFC_CTRL_ADDR, 0x80)	//accel offset reset
+	bmx_accel_write(ACC_OFC_SETTING_ADDR, 0x20) //offset_target   x = 0g, y = 0g, z = +1g
+	
+	bmx_accel_write(ACC_OFC_CTRL_ADDR, 0x20)	//accelX offset enabled
+	do
+		temp = bmx_accel_readByte(ACC_OFC_CTRL_ADDR)
+	dowhile readBit(temp, 4) == 0
+	
+	bmx_accel_write(ACC_OFC_CTRL_ADDR, 0x40) //accelY offset enabled
+	do
+		temp = bmx_accel_readByte(ACC_OFC_CTRL_ADDR)
+	dowhile readBit(temp, 4) == 0
+	
+	bmx_accel_write(ACC_OFC_CTRL_ADDR, 0x60) //accelZ offset enabled
+	do
+		temp = bmx_accel_readByte(ACC_OFC_CTRL_ADDR)
+	dowhile readBit(temp, 4) == 0
+endsub
+
+sub AccelOffsetLoadtoNVM()
+	dim temp
+	
+	temp = bmx_accel_readByte(ACC_TRIM_NVM_CTRL_ADDR)
+	temp = temp | 0x03
+	bmx_accel_write(ACC_TRIM_NVM_CTRL_ADDR, temp)
+	
+	do
+		temp = bmx_accel_readByte(ACC_TRIM_NVM_CTRL_ADDR)
+	dowhile	readBit(temp, 2) == 0
+endsub
+
+sub AccelOffsetLoad()
+	dim temp
+	
+	temp = bmx_accel_readByte(ACC_TRIM_NVM_CTRL_ADDR)
+	bitSet(temp, 3)
+	bmx_accel_write(ACC_TRIM_NVM_CTRL_ADDR, temp)
+	
+	do
+		temp = bmx_accel_readByte(ACC_TRIM_NVM_CTRL_ADDR)
+	dowhile	readBit(temp, 2) == 0
+endsub
+
+//====================================================
+//      BMX055 Accel Functions (End)
+//====================================================
+
+
+
+
+
+//====================================================
+//      BMX055 Gyro Functions (Begin)
+//====================================================
+
+function GyroGetChipID()
+	dim temp
+	temp = bmx_gyro_readByte(GYRO_Chip_ID_ADDR)
+endfunc temp
+
+
+// ***** Gyro Range set, get
+sub GyroSetRange(byval range as integer)
+	bmx_gyro_write(GYRO_RANGE_ADDR, range)
+endsub
+
+function GyroGetRange()
+	dim temp
+	temp = bmx_gyro_readByte(GYRO_RANGE_ADDR)		
+endfunc temp
+
+
+
+// ***** Gyro Bandwidth set, get
+sub GyroSetBw(byval bandwidth as integer)
+	bmx_gyro_write(GYRO_BW_ADDR, bandwidth)
+endsub
+
+function GyroGetBw()
+	dim temp
+	temp = bmx_gyro_readByte(GYRO_BW_ADDR)		
+endfunc temp
+
+
+
+
+sub GyroSetOperationMode(byval mode as integer)
+	dim res, temp, val$
+	
+	temp = bmx_gyro_readByte(GYRO_LPM1_ADDR)
+	temp = temp & 0x0F
+	
+	GyrOperationMode = mode
+	select mode
+		case GyroNormal_Mode
+			bmx_gyro_write(GYRO_LPM1_ADDR, temp)
+			
+		case GyroDeepSuspend_Mode
+			bitSet(temp, 5)
+			bmx_gyro_write(GYRO_LPM1_ADDR, 0x20)
+			
+		case GyroSuspend_Mode
+			bitSet(temp, 7)
+			bmx_gyro_write(GYRO_LPM1_ADDR, temp)
+			delay_ms(1)
+			
+			temp = bmx_gyro_readByte(GYRO_LPM2_ADDR)
+			bitClear(temp, 7)
+			bmx_gyro_write(GYRO_LPM2_ADDR, temp)
+		
+		case GyroFastPowerUpMode
+			bitSet(temp, 7)
+			bmx_gyro_write(GYRO_LPM1_ADDR, temp)
+			
+			temp = bmx_gyro_readByte(GYRO_LPM2_ADDR)
+			bitSet(temp, 7)
+			bmx_gyro_write(GYRO_LPM2_ADDR, temp)
+			
+		case else
+	endselect
+	delay_ms(2)
+endsub
+
+//***** Gyro Self Test (Begin) *****
+function GyroSelfTest()
+	dim res, temp
+	
+	bmx_gyro_write(GYRO_BIST_ADDR, 0x01)
+	delay_ms(1)
+	temp = bmx_gyro_readByte(GYRO_BIST_ADDR)
+	
+	if temp == 0x12 then
+		res = 1
+	else
+		res = 0
+	endif
+endfunc res
+
+function GyroSelfTestRateOK()
+	dim res, temp, val$
+	
+	temp = bmx_gyro_readByte(GYRO_BIST_ADDR)
+	temp = temp & 0x10
+	
+	if temp == 0x10 then
+		res = 1
+	else
+		res = 0
+	endif
+endfunc res
+//***** Gyro Self Test (End) *******
+
+
+//***** Gyro Offset Compensation (Begin) *****
+sub GyroSlowCompensation()
+	dim temp
+	
+	temp = bmx_gyro_readByte(GYRO_0x1A_ADDR)
+	bitClear(temp, 5)
+	bmx_gyro_write(GYRO_0x1A_ADDR, temp)	// Filtrelenmiş veriler için compensation
+	
+	bmx_gyro_write(GYRO_SOC_ADDR, 0x2F)	// 0.1°/s,  1280 ms,  x,y,z
+	delay_ms(2)
+	bmx_gyro_write(GYRO_SOC_ADDR, 0x00)
+endsub
+
+
+sub GyroFastCompensation()
+	dim temp
+	
+	GyroSetRange(Range_125s)
+	bmx_gyro_write(GYRO_INT_MAP_1_ADDR, 0x40)
+	
+	temp = bmx_gyro_readByte(GYRO_0x1B_ADDR)
+	bitClear(temp, 7)
+	bmx_gyro_write(GYRO_0x1B_ADDR, temp)	// Filtrelenmiş veriler için compensation
+	
+	bmx_gyro_write(GYRO_A_FOC_ADDR, 0xFF)
+	temp = bmx_gyro_readByte(GYRO_A_FOC_ADDR)
+	// print "temp: ";integer.h' temp; "\n"
+	//delay_ms(2)
+endsub
+
+
+sub GyroOffsetReset()
+	dim temp
+	
+	temp = bmx_gyro_readByte(GYRO_INT_RST_LATCH)
+	bitSet(temp, 6)
+	bmx_gyro_write(GYRO_INT_RST_LATCH, temp)
+endsub
+//***** Gyro Offset Compensation (End) *******
+
+
+sub GyroSoftreset()
+	bmx_gyro_write(GYRO_BGW_SOFTRESET_ADDR, 0xB6)
+	GyrOperationMode = GyroNormal_Mode
+	delay_ms(2)
+endsub
+
+//====================================================
+//      BMX055 Gyro Functions (End)
+//====================================================
+
+
+
+
+//====================================================
+//      BMX055 Magno Functions (Begin)
+//====================================================
+
+sub MagnoDataRateSet(byval rate as integer)
+	dim temp
+	
+	temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+	bitClear(temp, 3)
+	bitClear(temp, 4)
+	bitClear(temp, 5)
+	temp = temp | rate
+	bmx_magno_write(MAGNO_0x4C_ADDR, temp)
+	
+	MagnoBw = rate
+endsub
+
+
+function MagnoDataRateGet()
+	dim temp, rate
+	
+	temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+	rate = temp & 0x38
+endfunc rate
+
+
+sub MagSetOperationMode(byval mode as integer)
+	dim temp
+	
+	MagnoOperationMode = mode
+	select mode
+		case MagnoSuspendMode
+			bmx_magno_write(MAGNO_0x4B_ADDR, 0x00)
+			
+		case MagnoSleepMode
+			bmx_magno_write(MAGNO_0x4B_ADDR, 0x01)
+			temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+			bitSet(temp, 1)
+			bitSet(temp, 2)
+			bmx_magno_write(MAGNO_0x4C_ADDR, temp)
+			
+		case MagnoNormalMode
+			bmx_magno_write(MAGNO_0x4B_ADDR, 0x01)
+			temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+			bitClear(temp, 1)
+			bitClear(temp, 2)
+			bmx_magno_write(MAGNO_0x4C_ADDR, temp)
+			
+		case MagnoFarcedMode
+			bmx_magno_write(MAGNO_0x4B_ADDR, 0x01)
+			temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+			bitSet(temp, 1)
+			bitClear(temp, 2)
+			bmx_magno_write(MAGNO_0x4C_ADDR, temp)
+			
+		case else
+	endselect
+endsub
+
+
+sub ActiveModPresetSet(byval preset as integer)
+	MagnoActiveModPreset = preset
+	
+	select preset
+		case LowPowerPreset
+			bmx_magno_write(MAGNO_0x51_ADDR, 0x01)
+			bmx_magno_write(MAGNO_0x52_ADDR, 0x02)
+			MagnoDataRateSet(DataRate_10Hz)
+			
+		case RegularPreset
+			bmx_magno_write(MAGNO_0x51_ADDR, 0x04)
+			bmx_magno_write(MAGNO_0x52_ADDR, 0x0E)
+			MagnoDataRateSet(DataRate_10Hz)
+			
+		case EnhancedRegularPreset
+			bmx_magno_write(MAGNO_0x51_ADDR, 0x07)
+			bmx_magno_write(MAGNO_0x52_ADDR, 0x1A)
+			MagnoDataRateSet(DataRate_10Hz)
+			
+		case HighAccuracyPreset
+			bmx_magno_write(MAGNO_0x51_ADDR, 0x17)
+			bmx_magno_write(MAGNO_0x52_ADDR, 0x52)
+			MagnoDataRateSet(DataRate_20Hz)
+			
+		case else
+	endselect
+endsub
+
+
+function MagnoGetChipID()
+	dim ChipId, rd$
+	//bmx_magno_write(0x4B, 0x01)
+	MagSetOperationMode(MagnoSleepMode)
+	delay_ms(5)
+	ChipId = bmx_magno_readByte(MAG_Chip_ID_ADDR)
+endfunc ChipId
+
+
+function MagnoSelfTest()
+	dim res,  temp, OpMode
+	
+	res = 0
+	OpMode = MagnoOperationMode
+	MagSetOperationMode(MagnoSleepMode)
+	
+	temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+	bitSet(temp, 0)
+	
+	delay_ms(5)
+	
+	temp = bmx_magno_readByte(MAGNO_DATA_X_LSB_ADDR)
+	if(readBit(temp, 0) == 0) then
+		res = res | 0x01
+		//DbgMsg("MagnoX-Self-test başarısız!")
+	endif
+	
+	temp = bmx_magno_readByte(MAGNO_DATA_Y_LSB_ADDR)
+	if(readBit(temp, 0) == 0) then
+		res = res | 0x02
+		//DbgMsg("MagnoY-Self-test başarısız!")
+	endif
+	
+	temp = bmx_magno_readByte(MAGNO_DATA_Z_LSB_ADDR)
+	if(readBit(temp, 0) == 0) then
+		res = res | 0x04
+		//DbgMsg("MagnoZ-Self-test başarısız!")
+	endif
+endfunc res
+
+
+sub ReadTrim()
+	dim rc
+	dim data$ : data$ = ""
+	dim return$ : return$ = ""
+	
+	rc=BleEncode8(return$, 0x08, 0)
+	rc=BleEncode8(return$, 0x0B, 1)
+	
+	bmx_magno_read(MAGNO_DIG_X1_ADDR, data$, 2)
+	//print StrHexize$(data$); "\n"
+	return$ = return$ + data$
+	
+	bmx_magno_read(MAGNO_DIG_Z4_LSB_ADDR, data$, 4)
+	//print StrHexize$(data$); "\n"
+	return$ = return$ + data$
+	
+	bmx_magno_read(MAGNO_DIG_Z2_LSB_ADDR, data$, 10)
+	//print StrHexize$(data$); "\n"
+	return$ = return$ + data$
+	
+	//print "\n trim: "; StrHexize$(return$); "\n"
+	
+	rc = BleCharValueNotify(BleCharRx, return$)	: BMXAssertRC(rc, 877)
+	// rc = BleCharValueNotify(BleCharRx, SendData$)
+	
+
+endsub
+
+
+sub MagnoDRDYIntSet()
+	bmx_magno_write(MAGNO_0x4E_ADDR, 0xC4)
+endsub
+
+//====================================================
+//      BMX055 Magno Functions (End)
+//====================================================
+
+
+
+
+//====================================================
+//      BMX055 Interuppt Functions (Begin)
+//====================================================
+
+dim BleAccelDataNmbr	: BleAccelDataNmbr = 0
+dim BleGyroDataNmbr		: BleGyroDataNmbr = 0
+dim BleMagnoDataNmbr	: BleMagnoDataNmbr = 0
+
+dim SerialAccelDataNmbr	: SerialAccelDataNmbr = 0
+dim SerialGyroDataNmbr	: SerialGyroDataNmbr = 0
+dim SerialMagnoDataNmbr	: SerialMagnoDataNmbr = 0
+
+function HandleAccInterrupt()
+	GpioPinToggle(4)
+	dim LSB, MSB, rc
+	dim accel_data$ : accel_data$ = ""
+	dim send_accel$ : send_accel$ = ""
+	
+	bmx_accel_read(ACC_X_LSB_ADDR, accel_data$, 6)
+	
+	//if BleEnable == true then
+		if IsConnected() == true then	
+			//if SendEnable == true then	
+				
+				// BleAccelDataNmbr = BleAccelDataNmbr | 0x0000 | (AccelRange << 16)
+				// rc=BleEncode16(accel_data$, BleAccelDataNmbr, 6)
+				
+				rc=BleEncode8(send_accel$, BleAccelDataNmbr, 0)
+				rc=BleEncode8(send_accel$, AccelRange, 1)
+				send_accel$ = send_accel$ + accel_data$
+				
+				rc=BleDecode32(send_accel$, LSB, 0)
+				rc=BleDecode32(send_accel$, MSB, 4)
+					
+				rc = CircBufWrite(BleCircHndlCrrntData,LSB)	: BMXAssertRC(rc, 949)
+				rc = CircBufWrite(BleCircHndlCrrntData,MSB)	: BMXAssertRC(rc, 950)
+				
+				BleAccelDataNmbr = BleAccelDataNmbr + 1
+				if BleAccelDataNmbr >= 251 then
+					BleAccelDataNmbr = 0
+				endif
+			//endif
+		endif
+	//endif
+	
+	if SeriPortEnable == true then
+		
+		SerialAccelDataNmbr = SerialAccelDataNmbr | 0x0000
+		rc=BleEncode16(accel_data$, SerialAccelDataNmbr, 6)
+		rc=BleDecode32(accel_data$,LSB,0)
+		rc=BleDecode32(accel_data$,MSB,4)
+					
+		rc = CircBufWrite(SPCircHndlCrrntData,LSB)	: BMXAssertRC(rc, 967)
+		rc = CircBufWrite(SPCircHndlCrrntData,MSB)	: BMXAssertRC(rc, 968)
+		
+		SerialAccelDataNmbr = SerialAccelDataNmbr + 1
+		if SerialAccelDataNmbr >= 16001 then
+			SerialAccelDataNmbr = 0
+		endif	
+	endif
+	
+	
+	
+	// if FlashEnable == TRUE then
+		// dim nExitInfo
+				
+		// AccelDataNmbr = AccelDataNmbr | 0x0000
+		// rc=BleEncode16(accel_data$, AccelDataNmbr, 6)
+		// print "Accel: "; StrHexize$(accel_data$); "\n"
+		// if FlashLastAddress <= 1048500 then	// Flas Memory address range: 0 - 1048575 (0x000000 - 0x0FFFFF)
+			// rc = FlashWrite(FlashLastAddress, accel_data$, nExitInfo)
+			// print "flash rc: ";integer.h' rc; " exit: ";integer.h'nExitInfo; "last: "; FlashLastAddress; "\n"
+			// FlashLastAddress = FlashLastAddress + 8
+			
+		// endif
+		
+		// AccelDataNmbr = AccelDataNmbr + 1
+		// if AccelDataNmbr >= 16001 then
+			// AccelDataNmbr = 0
+		// endif
+		// AccelDataCount = AccelDataCount + 1
+	// endif
+	
+
+endfunc 1
+
+
+
+function HandleGyroInterrupt()
+	GpioPinToggle1(3)
+	dim LSB, MSB, rc
+	dim gyro_data$ : gyro_data$ = ""
+	dim send_gyro$ : send_gyro$ = ""
+	
+	bmx_gyro_read(GYRO_RATE_X_LSB_ADDR, gyro_data$, 6)
+	
+	//if BleEnable == TRUE then
+		if IsConnected() == 1 then
+			// if SendEnable == 1 then
+				
+				// BleGyroDataNmbr = BleGyroDataNmbr | 0x8000 | (GyroRange << 16)
+				// rc=BleEncode16(gyro_data$, BleGyroDataNmbr, 6)
+				
+				rc=BleEncode8(send_gyro$, BleGyroDataNmbr, 0)
+				rc=BleEncode8(send_gyro$, (0x80 | GyroRange), 1)
+				send_gyro$ = send_gyro$ + gyro_data$
+				
+				rc=BleDecode32(send_gyro$, LSB, 0)
+				rc=BleDecode32(send_gyro$, MSB, 4)
+				
+				rc = CircBufWrite(BleCircHndlCrrntData, LSB)	: BMXAssertRC(rc, 1020)
+				rc = CircBufWrite(BleCircHndlCrrntData, MSB)	: BMXAssertRC(rc, 1021)
+				
+				BleGyroDataNmbr = BleGyroDataNmbr + 1
+				if (BleGyroDataNmbr & 0x3FFF) >= 251 then
+					BleGyroDataNmbr = 0
+				endif
+			// endif
+		endif
+	//endif
+	
+	if SeriPortEnable == true then
+		
+		SerialGyroDataNmbr = SerialGyroDataNmbr | 0x8000
+		rc=BleEncode16(gyro_data$, SerialGyroDataNmbr, 6)
+		rc=BleDecode32(gyro_data$,LSB,0)
+		rc=BleDecode32(gyro_data$,MSB,4)
+					
+		rc = CircBufWrite(SPCircHndlCrrntData,LSB)	: BMXAssertRC(rc, 1038)
+		rc = CircBufWrite(SPCircHndlCrrntData,MSB)	: BMXAssertRC(rc, 1039)
+		
+		SerialGyroDataNmbr = SerialGyroDataNmbr + 1
+		if (SerialGyroDataNmbr & 0x3FFF) >= 16001 then
+			SerialGyroDataNmbr = 0
+		endif
+	endif
+	
+	// if FlashEnable == TRUE then
+		// dim nExitInfo
+					
+		// GyroDataNmbr = GyroDataNmbr | 0x4000
+		// rc=BleEncode16(gyro_data$, GyroDataNmbr, 6)
+		
+		// if FlashLastAddress <= 1048500 then	// Flas Memory address range: 0 - 1048575 (0x000000 - 0x0FFFFF)
+			// rc = FlashWrite(FlashLastAddress, gyro_data$, nExitInfo)	: BMXAssertRC(rc, 1045)
+			// print "gyro flash rc: ";integer.h' rc; " exit: ";integer.h'nExitInfo; "last: "; FlashLastAddress; "\n"
+			// FlashLastAddress = FlashLastAddress + 8	
+		// endif
+		
+		// GyroDataNmbr = GyroDataNmbr + 1
+		// if (GyroDataNmbr & 0x3FFF) >= 16001 then
+			// GyroDataNmbr = 0
+		// endif
+		// GyroDataCount = GyroDataCount + 1
+		
+	// endif
+endfunc 1
+
+
+
+function HandleMagnoInterrupt()
+	GpioPinToggle2(1)
+	dim LSB, MMSB, MSB, rc
+	dim magno_data$ : magno_data$ = ""
+	dim send_magno$ : send_magno$ = ""
+	
+	bmx_magno_read(MAGNO_DATA_X_LSB_ADDR, magno_data$, 8)
+	
+	//if BleEnable == TRUE then
+		if IsConnected() == true then
+			// if SendEnable == true then
+				
+				// rc=BleEncode8(send_gyro$, BleGyroDataNmbr, 0)
+				// rc=BleEncode8(send_gyro$, (0x80 | GyroRange), 1)
+				
+				// BleMagnoDataNmbr = BleMagnoDataNmbr & 0x3FFF
+				// BleMagnoDataNmbr = BleMagnoDataNmbr | 0x4000
+				// rc=BleEncode16(send_magno$, BleMagnoDataNmbr, 0)
+				
+				rc=BleEncode8(send_magno$, BleMagnoDataNmbr, 0)
+				rc=BleEncode8(send_magno$, 0x40, 1)
+				send_magno$ = send_magno$ + magno_data$
+				
+				// print StrHexize$(send_magno$); "\n"
+				
+				rc=BleDecode32(send_magno$, LSB,  0)
+				rc=BleDecode32(send_magno$, MMSB, 4)
+				rc=BleDecode32(send_magno$, MSB,  8)
+				
+				
+				rc = CircBufWrite(BleCircHndlCrrntData, LSB)	: BMXAssertRC(rc, 1086)
+				rc = CircBufWrite(BleCircHndlCrrntData, MMSB)	: BMXAssertRC(rc, 1087)
+				rc = CircBufWrite(BleCircHndlCrrntData, MSB)	: BMXAssertRC(rc, 1088)
+				
+				BleMagnoDataNmbr = BleMagnoDataNmbr + 1
+				if (BleMagnoDataNmbr & 0x3FFF )>= 251 then
+					BleMagnoDataNmbr = 0
+				endif
+			// endif
+		endif
+	//endif
+	
+	if SeriPortEnable == true then
+		
+		SerialMagnoDataNmbr = SerialMagnoDataNmbr | 0x8000
+		rc=BleEncode16(magno_data$, SerialMagnoDataNmbr, 6)
+		rc=BleDecode32(magno_data$,LSB,0)
+		rc=BleDecode32(magno_data$,MSB,4)
+		
+		rc = CircBufWrite(SPCircHndlCrrntData,LSB)	: BMXAssertRC(rc, 1104)
+		rc = CircBufWrite(SPCircHndlCrrntData,MSB)	: BMXAssertRC(rc, 1105)
+		
+		SerialMagnoDataNmbr = SerialMagnoDataNmbr + 1
+		if (SerialMagnoDataNmbr & 0x3FFF )>= 16001 then
+			SerialMagnoDataNmbr = 0
+		endif
+	endif
+	
+	// if FlashEnable == TRUE then
+		// dim nExitInfo
+		
+		// MagnoDataNmbr = MagnoDataNmbr | 0x8000
+		// rc=BleEncode16(magno_data$, MagnoDataNmbr, 6)
+		
+		// if FlashLastAddress <= 1048500 then	// Flas Memory address range: 0 - 1048575 (0x000000 - 0x0FFFFF)
+			// rc = FlashWrite(FlashLastAddress, magno_data$, nExitInfo)
+			// FlashLastAddress = FlashLastAddress + 8	
+		// endif
+		
+		
+		// MagnoDataNmbr = MagnoDataNmbr + 1
+		// if (MagnoDataNmbr & 0x3FFF )>= 16001 then
+			// MagnoDataNmbr = 0
+		// endif
+		// MagnoDataCount = MagnoDataCount + 1
+		
+	// endif
+endfunc 1
+
+//====================================================
+//      BMX055 Interuppt Functions (End)
+//====================================================
+
+
+
+function BMXCommunicationTest() as integer
+	dim res : res=0
+	
+	if AccGetChipID() == 0xFA then 
+		AccelReady = true
+	else
+		AccelReady = false
+		res = res | 0x02
+	endif
+	
+	if GyroGetChipID() == 0x0F then
+		GyroReady = true
+	else
+		GyroReady = false
+		res = res | 0x04	
+	endif
+	
+	if MagnoGetChipID() == 0x32 then
+		MagnoReady = true
+	else
+		MagnoReady = false
+		res = res | 0x08
+	endif
+endfunc res
+
+
+function bmx_init()
+	dim rc, res : res=0
+	
+	dim SubFunc
+	SubFunc = Pull_Down_Resistor_Strong | WakeUp_HIGH
+	rc=SetPinSIO(bmx_int1, DIGITAL_IN, SubFunc) 		: BMXAssertRC(rc, 1171) : res = res | rc
+	rc=SetPinSIO(bmx_int3, DIGITAL_IN, SubFunc) 		: BMXAssertRC(rc, 1172) : res = res | rc
+	rc=SetPinSIO(bmx_drdy, DIGITAL_IN, SubFunc) 		: BMXAssertRC(rc, 1173) : res = res | rc
+	
+	// GpioDigitalWrite(bmx_cs1, HIGH)
+	// GpioDigitalWrite(bmx_cs2, HIGH)
+	// GpioDigitalWrite(bmx_cs3, HIGH)
+	
+	GpioWrite(bmx_cs1, HIGH)
+	GpioWrite(bmx_cs2, HIGH)
+	GpioWrite(bmx_cs3, HIGH)
+	
+	res=BMXCommunicationTest()
+	
+	
+	//**** bmx_int1 *****
+	if GpioBindEvent(0, bmx_int1, Rising_Edge) then
+		//DbgMsg("bmx_int1 pinine event atanırken hata oluştu!")
+	else
+		onevent evgpiochan0 call HandleAccInterrupt
+	endif
+	
+	//**** bmx_int3 *****
+	if GpioBindEvent(1, bmx_int3, Rising_Edge) then
+		//DbgMsg("bmx_int3 pinine event atanırken hata oluştu!")
+	else
+		onevent evgpiochan1 call HandleGyroInterrupt
+	endif
+	
+	//**** bmx_drdy *****
+	if GpioBindEvent(2, bmx_drdy, Rising_Edge) then
+		//DbgMsg("bmx_drdy pinine event atanırken hata oluştu!")
+	else
+		onevent evgpiochan2 call HandleMagnoInterrupt
+	endif
+
+endfunc res
+
+
+
+function ACC_init()
+	dim res, temp, temp1
+	res = false
+	
+	if (AccelReady == true) && (AccelSelfTestResult == 0x00) then
+		// AccFastCompensation()
+		
+		AccSetOperationMode(AccNormal_Mode)
+		AccSetOperationMode(AccStandby_Mode)
+		delay_ms(1)
+		
+		temp = bmx_accel_readByte(ACC_PMU_LOW_POWER_ADDR)
+		temp1 = bmx_accel_readByte(ACC_PMU_LPW_ADDR)
+		
+		if (readBit(temp, 6) == 1) && (readBit(temp1, 7) == 1) then
+			AccSetPmuBw(AccelBW_62f5Hz)
+			AccelBw = AccelBW_62f5Hz
+			AccSetPmuRange(Range_2g)
+			AccelRange = Range_2g
+			bmx_accel_write(ACC_INT_MAP1ADDR, 0x01)	// INT1 pin enable bit
+			bmx_accel_write(ACC_INT_EN1ADDR, 0x10)	// data ready interrupt bit: 0 (disabled), or 1 (enabled)
+			res = true
+		else
+			res = false
+		endif	
+	else
+		res = false
+	endif
+
+endfunc res
+
+
+function GYRO_init()
+	dim res, temp, temp1
+	res = false
+	
+	if (GyroReady == true) && (GyroSelfTestResult == 0x00) then
+
+		//GyroFastCompensation()
+		//GyroSlowCompensation()
+		
+		GyroSetOperationMode(GyroNormal_Mode)
+		delay_ms(1)
+		GyroSetOperationMode(GyroFastPowerUpMode)
+		delay_ms(1)
+
+		temp = bmx_gyro_readByte(GYRO_LPM1_ADDR)
+		temp1 = bmx_gyro_readByte(GYRO_LPM2_ADDR)
+			
+
+		if (readBit(temp, 7) == 1) && (readBit(temp1, 7) == 1) then
+			GyroSetRange(Range_2000s)
+			GyroSetBw(GyroBW_32Hz)
+			GyroBw = GyroBW_32Hz
+			GyroRange = Range_2000s
+			
+			bmx_gyro_write(GYRO_INT_EN_1_ADDR, 0x0D)
+			bmx_gyro_write(GYRO_INT_MAP_1_ADDR, 0x01)	// INT3 pin  enable
+			bmx_gyro_write(GYRO_INT_EN_0_ADDR, 0x80)	// New Data Enable (0x15)
+			res = true
+		else
+			res = false
+		endif	
+	else
+		res = false
+	endif
+
+endfunc res
+
+
+function MAGNO_init()
+	dim res, temp
+	res = false
+	
+	if (MagnoReady == true) && (MagnoSelfTestResult == 0x00) then
+			
+		MagSetOperationMode(MagnoSleepMode)
+		delay_ms(3)
+		temp = bmx_magno_readByte(MAGNO_0x4C_ADDR)
+		
+		if (temp & 0x06) == 0x06 then
+			ReadTrim()
+		
+			MagnoDataRateSet(DataRate_30Hz)
+			MagnoBw = DataRate_30Hz
+			
+			bmx_magno_write(0x51, 0x04)
+			bmx_magno_write(0x52, 0x0F)
+			MagnoDRDYIntSet()
+			res = true
+		else
+			res = false
+		endif
+	else
+		res = false
+	endif
+endfunc res
+
+
+
+sub SetInterVal()
+	dim rc, interval, accInter, magnoInter
+	dim SendData$
+	interval = 20
+	accInter = 150
+	magnoInter = 150
+	SendData$ = ""
+	
+	if (MagnoEnable == true) && (MagnoReadEnable == true) then
+		select MagnoBw
+			case DataRate_2Hz
+				magnoInter = 77 //255	// 400*1.25 (*1000 us)
+			case DataRate_6Hz
+				magnoInter = 77 //130	// 130*1.25 (*1000 us)
+			case DataRate_8Hz
+				magnoInter = 77 //100	// 100*1.25 (*1000 us)
+			case DataRate_10Hz
+				magnoInter = 77	// 80*1.25 (*1000 us)
+			case DataRate_15Hz
+				magnoInter = 37	// 40*1.25 (*1000 us)
+			case DataRate_20Hz
+				magnoInter = 37	// 40*1.25 (*1000 us)
+			case DataRate_25Hz
+				magnoInter = 22	// 25*1.25 (*1000 us)
+			case DataRate_30Hz
+				magnoInter = 22	// 25*1.25 (*1000 us)
+			case else
+		endselect
+	endif
+	
+	if (AccelEnable == true) &&(AccelReadEnable == true) then
+		select AccelBw
+			case AccelBW_7f81Hz		// 7.81 Hz 	 64 ms
+				accInter = 47		// 50*1.25 (*1000 us)
+			case AccelBW_15f63Hz	// 15.63 Hz	 32 ms
+				accInter = 22		// 25*1.25 (*1000 us)
+			case AccelBW_31f25Hz	// 31.25 Hz	 16 ms
+				accInter = 10		// 12*1.25 (*1000 us)
+			case AccelBW_62f5Hz		// 62.5 Hz	 8 ms
+				accInter = 6		// 6*1.25 (*1000 us)
+			case AccelBW_125Hz		// 125 Hz	 4 ms
+				accInter = 6		// 6*1.25 (*1000 us)
+			case else
+		endselect		
+	endif
+	
+	if accInter < magnoInter then
+		if accInter < 145 then
+			interval = accInter
+		endif
+	else
+		if magnoInter < 145 then
+			interval = magnoInter
+		endif
+	endif
+	
+	if (GyroEnable == true) && (GyroReadEnable == true) then
+		select GyroBw
+			case GyroBW_32Hz		// 32 Hz	ODR: 100 Hz
+				interval = 6		// 6*1.25 (*1000 us)
+			case GyroBW_64Hz		// 64 Hz	ODR: 200 Hz
+				interval = 6		// 6*1.25 (*1000 us)
+			case GyroBW_12Hz		// 12 Hz	ODR: 100 Hz
+				interval = 6		// 6*1.25 (*1000 us)
+			case GyroBW_23Hz		// 23 Hz	ODR: 200 Hz
+				interval = 6
+			case else
+		endselect		
+	endif
+	
+	
+	if (interval > 5) && (interval != BleConnInterVal) then
+		BleConnInterVal = interval
+		rc=BleEncode8(SendData$, 0x08, 0)
+		rc=BleEncode8(SendData$, 0x0A, 1)
+		rc=BleEncode8(SendData$, BleConnInterVal, 2)
+		
+		rc = BleCharValueNotify(BleCharRx, SendData$)
+		//print "rc: "; rc; "   interval:"; BleConnInterVal; "\n"
+	endif
+endsub
+
+//****************************************************
+//      BMX055 Functions (End)
+//****************************************************
+
+
+
+
+

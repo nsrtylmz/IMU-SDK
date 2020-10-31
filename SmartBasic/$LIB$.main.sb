@@ -1,0 +1,300 @@
+
+#include "$LIB$.GlobalVariable.sb"
+
+
+dim BleCircHndlCrrntData
+dim CircHndlOldData
+dim CircHndlCurrentTemp
+dim CircHndlOldTemp
+dim SPCircHndlCrrntData
+
+dim MainAssertRCEnable
+
+dim r
+r = GpioSetFunc(4, 2, 0)
+r = GpioSetFunc(3, 2, 0)
+r = GpioSetFunc(1, 2, 0)
+r = GpioSetFunc(0, 2, 0)
+
+
+
+MainAssertRCEnable = false
+sub MainAssertRC(byval rc as integer,byval tag as integer)
+	if MainAssertRCEnable == TRUE then
+		if 1 && (rc!=0) then
+			print "Main Failed with ";integer.h' rc;" at tag ";tag;"\n"
+		endif
+	endif
+endsub
+
+
+
+
+function CreatCircBuff()
+	dim rc, res: res=0
+	
+	rc = CircBufCreate(1500, BleCircHndlCrrntData) 	: MainAssertRC(rc, 36)	: res = res | rc
+	rc = CircBufCreate(2000, SPCircHndlCrrntData)	: MainAssertRC(rc, 37)	: res = res | rc
+	// rc = CircBufCreate(200,  BleCircHndlMagData)	: MainAssertRC(rc, 38)	: res = res | rc
+	rc = CircBufCreate(100,  CircHndlOldData) 		: MainAssertRC(rc, 38)	: res = res | rc
+	// rc = CircBufCreate(100,  CircHndlCurrentTemp) 	: MainAssertRC(rc, 39)	: res = res | rc
+	// rc = CircBufCreate(100,  CircHndlOldTemp) 		: MainAssertRC(rc, 40)	: res = res | rc
+endfunc res
+
+
+
+#include "$LIB$.BLE.sb"
+#include "$LIB$.BMX055.sb"
+#include "$LIB$.UART.sb"
+#include "$LIB$.BleCommunication.sb"
+
+dim BleOldData$
+dim BleOldMagData$
+function HandlerTimer0()
+	GpioPinToggle2(1)
+	// print "Timer0\n"
+	dim rc, n, count, nData, nItems, nPacket, LSB, MSB, MMSB
+	dim SendPacketData$
+	
+	SendPacketData$ = ""
+	nPacket = 0
+	count = 0
+	
+	if IsConnected() then
+		if BleCharTxEnable == TRUE then
+			while nPacket < 4
+				n = 0
+				
+				rc = CircBufItems(CircHndlOldData, nItems)			//: MainAssertRC(rc, 77) : 
+				while nItems != 0
+					// print "old\n";
+					rc = CircBufRead(CircHndlOldData, LSB)			: MainAssertRC(rc, 78)
+					
+					if (LSB & 0x00004000) == 0x00004000 then
+						rc = CircBufRead(CircHndlOldData, MMSB)			: MainAssertRC(rc, 80)
+						rc = CircBufRead(CircHndlOldData, MSB)			: MainAssertRC(rc, 80)
+						
+						if StrLen(SendPacketData$) == 10 then
+							rc = CircBufWrite(CircHndlOldData, LSB)		: MainAssertRC(rc, 1086)
+							rc = CircBufWrite(CircHndlOldData, MMSB)	: MainAssertRC(rc, 1087)
+							rc = CircBufWrite(CircHndlOldData, MSB)		: MainAssertRC(rc, 1088)
+							count = 1
+						else
+							rc = BleEncode32(SendPacketData$, LSB, n)		: n = n + 4
+							rc = BleEncode32(SendPacketData$, MMSB, n)		: n = n + 4
+							rc = BleEncode16(SendPacketData$, MSB, n)		: n = n + 2
+						endif
+					else
+						rc = CircBufRead(CircHndlOldData, MSB)			: MainAssertRC(rc, 80)
+						
+						rc = BleEncode32(SendPacketData$, LSB, n)		: n = n + 4
+						rc = BleEncode32(SendPacketData$, MSB, n)		: n = n + 4
+					endif
+					
+						
+					if (StrLen(SendPacketData$) > 15) || count == 1 then	
+						break
+					endif
+					rc = CircBufItems(CircHndlOldData, nItems) 		//: MainAssertRC(rc, 87)
+				endwhile
+				count = 0
+				
+				if StrLen(SendPacketData$) <= 10 then
+					// print "new\n";
+					rc = CircBufItems(BleCircHndlCrrntData, nItems)			//: MainAssertRC(rc, 90)	
+					while nItems != 0
+						rc = CircBufRead(BleCircHndlCrrntData, LSB)			: MainAssertRC(rc, 91)
+						
+						if (LSB & 0x00004000) == 0x00004000 then
+							rc = CircBufRead(BleCircHndlCrrntData, MMSB)			: MainAssertRC(rc, 93)
+							rc = CircBufRead(BleCircHndlCrrntData, MSB)			: MainAssertRC(rc, 93)
+							
+							if StrLen(SendPacketData$) == 10 then
+								rc = CircBufWrite(CircHndlOldData, LSB)		: MainAssertRC(rc, 1086)
+								rc = CircBufWrite(CircHndlOldData, MMSB)	: MainAssertRC(rc, 1087)
+								rc = CircBufWrite(CircHndlOldData, MSB)		: MainAssertRC(rc, 1088)
+								count = 1
+							else
+								rc = BleEncode32(SendPacketData$, LSB, n)			: n = n + 4
+								rc = BleEncode32(SendPacketData$, MMSB, n)			: n = n + 4
+								rc = BleEncode16(SendPacketData$, MSB, n)			: n = n + 2
+							endif
+						else
+							rc = CircBufRead(BleCircHndlCrrntData, MSB)			: MainAssertRC(rc, 93)
+							
+							rc = BleEncode32(SendPacketData$, LSB, n)			: n = n + 4
+							rc = BleEncode32(SendPacketData$, MSB, n)			: n = n + 4
+						endif
+						
+						
+						if (StrLen(SendPacketData$) > 15) || count == 1 then
+							break
+						endif
+						rc = CircBufItems(BleCircHndlCrrntData, nItems)		//: MainAssertRC(rc, 100)
+					endwhile			
+				endif
+				count = 0
+				
+					
+				if StrLen(SendPacketData$) > 1 then
+					n = StrLen(SendPacketData$)
+					// rc = BleEncode8(SendPacketData$, StrSum(SendPacketData$, 0, StrLen(SendPacketData$), 0)%256, StrLen(SendPacketData$))
+					rc = BleEncode8(SendPacketData$, StrSum(SendPacketData$, 0, n, 0)%256, n)
+					// print "Send: "; StrHexize$(SendPacketData$); "\n"
+					rc = BleCharValueNotify(BleCharTx, SendPacketData$)			//: MainAssertRC(rc, 117)
+					if rc !=0 then
+						dim k
+						
+						if (StrGetChr(SendPacketData$, 1) & 0x40) == 0x40 then
+							for k=0 to 1
+								rc = BleDecode32(SendPacketData$, nData, k*4)
+								rc = CircBufWrite(CircHndlOldData, nData)		: MainAssertRC(rc, 124)
+							next
+							rc = BleDecodeU16(SendPacketData$, nData, 8)
+							rc = CircBufWrite(CircHndlOldData, nData)		: MainAssertRC(rc, 124)
+							
+							if StrLen(SendPacketData$) != 11 then
+								for k=0 to 1
+									rc = BleDecode32(SendPacketData$, nData, 10 + k*4)
+									rc = CircBufWrite(CircHndlOldData, nData)		: MainAssertRC(rc, 124)
+								next
+							endif
+							
+						else
+							for k=0 to 1
+								rc = BleDecode32(SendPacketData$, nData, k*4)
+								rc = CircBufWrite(CircHndlOldData, nData)		: MainAssertRC(rc, 124)
+							next
+							
+							if StrLen(SendPacketData$) != 9 then
+								if (StrGetChr(SendPacketData$, 8) & 0x40) == 0x40 then
+									for k=2 to 3
+										rc = BleDecode32(SendPacketData$, nData, k*4)
+										rc = CircBufWrite(CircHndlOldData, nData)		: MainAssertRC(rc, 124)
+									next
+									rc = BleDecodeU16(SendPacketData$, nData, 16)
+									rc = CircBufWrite(CircHndlOldData, nData)		: MainAssertRC(rc, 124)
+								else
+									for k=2 to 3
+										rc = BleDecode32(SendPacketData$, nData, k*4)
+										rc = CircBufWrite(CircHndlOldData, nData)		: MainAssertRC(rc, 124)
+									next
+								endif
+							endif
+						endif	
+					endif
+					
+				else
+					break
+				endif
+				
+				SendPacketData$ = ""
+				nPacket = nPacket + 1
+			endwhile
+		endif
+	endif
+	// print "TimerEnd\n"
+endfunc 1
+
+
+dim Timer2Count	: Timer2Count = 0
+function HandlerTimer2()
+	// GpioPinToggle3(0)
+	dim rc, nItems, LSB, MSB
+	dim LSB$, MSB$
+	
+	Timer2Count = Timer2Count + 1
+	if Timer2Count >= 3 then
+		Timer2Count = 0
+		UartOk = true
+	endif
+	
+	if UartOk == true then
+		UartOk = false
+		UartSendData$ = ""
+		Timer2Count = 0
+				
+		rc=BleEncode8(UartSendData$, 0x08, 1)	// Event
+		rc=BleEncode8(UartSendData$, 0x00, 2)	// Data
+			
+		rc = CircBufItems(SPCircHndlCrrntData, nItems)
+		while nItems > 0
+			
+			rc = CircBufRead(SPCircHndlCrrntData, LSB)
+			rc = BleEncode32(LSB$, LSB, 0)
+			rc = CircBufRead(SPCircHndlCrrntData, MSB)
+			rc = BleEncode32(MSB$, MSB, 0)
+			UartSendData$ = UartSendData$ + LSB$ + MSB$
+			
+			if StrLen(UartSendData$) > 200 then
+				break
+			endif
+			
+			rc = CircBufItems(SPCircHndlCrrntData, nItems)	
+		endwhile
+		rc=BleEncode8(UartSendData$, StrLen(UartSendData$), 0)	// Data Length
+		
+		if StrLen(UartSendData$) > 4 then
+			rc = UartWrite(UartSendData$)
+		endif
+	endif
+	
+endfunc 1
+
+
+
+sub MainOnStart()
+	dim rc
+	
+	BleEnable = FALSE
+	FlashEnable = FALSE
+	SeriPortEnable = false
+	
+	ENABLE_DEBUG_PRINTS = true
+
+	rc = CreatCircBuff()	: MainAssertRC(rc, 180)
+	
+	// if UART_Init() == 0 then
+		// ENABLE_DEBUG_PRINTS = FALSE	
+	// else
+		// print "UART initialize failed!\n"
+	// endif
+	
+	
+	if Spi_Init() == 0 then
+		rc = bmx_init()
+		
+		AccelSelfTestResult = AccSelfTest()
+		AccSetOperationMode(AccDeep_Suspend_Mode)
+		
+		GyroSelfTestResult = GyroSelfTest()
+		GyroSetOperationMode(GyroDeepSuspend_Mode)
+		
+		MagnoSelfTestResult = MagnoSelfTest()
+		MagSetOperationMode(MagnoSuspendMode)
+	endif
+	
+	if SpiFlashOpen() != 0 then
+		FlashEnable = FALSE
+	endif
+	
+endsub
+
+
+
+
+
+OnEvent EVTMR0	call HandlerTimer0
+OnEvent EVTMR2	call HandlerTimer2
+
+MainOnStart()
+
+
+WAITEVENT
+
+print "Exiting..."
+
+
+
+
+

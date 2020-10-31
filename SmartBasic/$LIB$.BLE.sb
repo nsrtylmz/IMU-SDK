@@ -1,0 +1,950 @@
+
+
+
+
+        //This defines how the application startsup and is a bit mask.
+        //Bit 0 == 1 then OnStartup() is called just before waitevent
+        //Bit 1 == 1 then StartAds() is called just before waitevent
+#define AUTO_STARTUP                      3
+
+        //Set this to 0 to disable all debugging messages
+// #define ENABLE_DEBUG_PRINTS               1
+
+#define DEVICENAME                        "Ble Optoel"		//"LAIRD_TS"
+#define DEVICENAME_WRITABLE               1
+#define APPEARANCE                        BLE_APPEARANCE_UNKNOWN
+#define MANF_NAME                         "Optoel Muhendislik"
+#define MODELSTR                          "OptoeIMU v1.0"
+#define SERIALNUM                         "12345"
+#define HWREV                             "HwRev1.0"
+#define SWREV                             "SwRev1.0"
+#define SYSID                             "\01\02\03\04\05\06\07\08"
+//#define SYSID                             "@"
+//#define REGLIST                           "\DE\AD\C0\DE"
+#define REGLIST                           ""
+//#define PNPID                             "\01\04\BF\03\20\00\01"
+#define PNPID                             ""
+
+
+        //Minimum acceptable connection interval (0.5 seconds)
+#define MIN_CONN_INTERVAL                 7500
+#define MAX_CONN_INTERVAL                 110000
+#define SLAVE_LATENCY                     0
+        //Connection supervisory timeout (4 seconds) - max 32 seconds
+#define CONN_SUP_TIMEOUT                  1000000
+        //DiscoverableMode, set to BLE_DISCOVERABILITY_xxx
+#define DISCOVERY_MODE                    BLE_DISCOVERABILITY_GENERAL
+#define MAX_DEVNAME_CHRS                  20
+        //Set Appearance advertise 0 to suppress
+#define ADV_APPEARANCE                    1
+        //Advertise interval
+#define ADV_INTERVAL_MS                   100
+        //Advertise timeout
+#define ADV_TIMEOUT_MS                    1000000
+
+
+
+        //Whitelist Policy in Adverts
+#define ADV_WHITELIST_FILTER_POLICY       ADV_FILTERPOLICY_ANY
+
+        //Minimum long term key size in octets
+#define MIN_LTK_SIZE                      8
+        //Maximum long term key size in octets
+#define MAX_LTK_SIZE                      16
+
+        //Set this to non-zero to enable notify on batt service
+#define BATT_NOTIFY                       0
+#define BATT_INIT_LEVEL_PERC              100
+
+        //This sets the pairing i/o capability using bonding
+#define PAIRING_IOCAPABILITY              BLE_IOCAPABILITY_NONE
+
+        //Connection Update Negotiation paramters
+// #define FIRST_CONN_PARAMS_UPDATE_DELAY    5000
+// #define NEXT_CONN_PARAMS_UPDATE_DELAY     5000
+// #define MAX_CONN_PARAMS_UPDATE_DELAY      15000
+
+        //Whether to require bonding or not
+// #define REQUIRE_BONDING                   1
+
+#define MAX_HTM_LEN         13
+
+
+#define BLE_CONN_HANDLE_INVALID                             0xFFFF
+#define BLE_INVALID_UUID_HANDLE                             0
+#define BLE_INVALID_CHAR_HANDLE                             0
+#define BLE_INVALID_SERVICE_HANDLE                          0
+#define CIRCBUFFER_INVALID_HANDLE                           -1
+
+//Set BLE_DISCOVERABILITY_NONE if whitelist is enabled in BleAdvertStart()
+//as the 4.0 spec says if whitelist is enabled then discoverability is not allowed
+#define BLE_DISCOVERABILITY_NONE                            0
+#define BLE_DISCOVERABILITY_LIMITED                         1
+#define BLE_DISCOVERABILITY_GENERAL                         2
+#define BLE_DISCOVERABILITY_BOTH                            3
+
+#define BLE_APPEARANCE_UNKNOWN                              0
+
+
+// #define UUID_ALERT_NOTIFICATION_SERVICE                     0x1811
+// #define UUID_BATTERY_SERVICE                                0x180F
+// #define UUID_BLOOD_PRESSURE_SERVICE                         0x1810
+// #define UUID_CURRENT_TIME_SERVICE                           0x1805
+#define UUID_DEVICE_INFORMATION_SERVICE                     0x180A
+// #define UUID_GLUCOSE_SERVICE                                0x1808
+// #define UUID_HEALTH_THERMOMETER_SERVICE                     0x1809
+// #define UUID_HEART_RATE_SERVICE                             0x180D
+// #define UUID_HUMAN_INTERFACE_DEVICE_SERVICE                 0x1812
+// #define UUID_IMMEDIATE_ALERT_SERVICE                        0x1802
+// #define UUID_LINK_LOSS_SERVICE                              0x1803
+// #define UUID_NEXT_DST_CHANGE_SERVICE                        0x1807
+// #define UUID_PHONE_ALERT_STATUS_SERVICE                     0x180E
+// #define UUID_REFERENCE_TIME_UPDATE_SERVICE                  0x1806
+// #define UUID_SCAN_PARAMETERS_SERVICE                        0x1813
+// #define UUID_TX_POWER_SERVICE                               0x1804
+
+#define BLE_SERVICE_SECONDARY                               0
+#define BLE_SERVICE_PRIMARY                                 1
+
+#define BLE_CHAR_METADATA_ATTR_NOT_PRESENT                  0
+
+#define BLE_ATTR_ACCESS_NONE                                0
+#define BLE_ATTR_ACCESS_OPEN                                1
+#define BLE_ATTR_ACCESS_ENC_NO_MITM                         2
+#define BLE_ATTR_ACCESS_ENC_WITH_MITM                       3
+#define BLE_ATTR_ACCESS_SIGNED_NO_MITM                      4
+#define BLE_ATTR_ACCESS_SIGNED_WITH_MITM                    5
+
+#define BLE_CHAR_PROPERTIES_BROADCAST                       0x01
+#define BLE_CHAR_PROPERTIES_READ                            0x02
+#define BLE_CHAR_PROPERTIES_WRITE_WO_RESPONSE               0x04
+#define BLE_CHAR_PROPERTIES_WRITE                           0x08
+#define BLE_CHAR_PROPERTIES_NOTIFY                          0x10
+#define BLE_CHAR_PROPERTIES_INDICATE                        0x20
+#define BLE_CHAR_PROPERTIES_AUTH_SIGNED_WR                  0x40
+#define BLE_CHAR_PROPERTIES_RELIABLE_WRITE                  0x80
+
+
+
+//Types of advert packets
+#define ADV_IND                                             0	// Bağlantı isteklerini davet eder
+#define ADV_DIRECT_IND                                      1	// Adresli cihazdan bağlantı davet ediyor.
+#define ADV_SCAN_IND                                        2	// Daha fazla reklam verisi için tarama isteği davet ediyor
+#define ADV_NONCONN_IND                                     3	// Adresli cihazdan bağlantı davet ediyor.
+// bknz: CS-GUIDE-smartBASICEXT-BL652 v28_10_7_2.pdf  sayfa: 88
+
+//Types of filter policy
+#define ADV_FILTERPOLICY_ANY                                0
+#define ADV_FILTERPOLICY_SCANREQ                            1
+#define ADV_FILTERPOLICY_CONNREQ                            2
+#define ADV_FILTERPOLICY_BOTH                               3
+
+//BLE EVENT MSG IDs
+#define BLE_EVBLEMSGID_CONNECT                              0   //msgCtx = connection handle
+#define BLE_EVBLEMSGID_DISCONNECT                           1   //msgCtx = connection handle
+#define BLE_EVBLEMSGID_IMMEDIATE_ALERT_SERVICE_ALERT        2   //msgCtx = alert level
+#define BLE_EVBLEMSGID_LINKLOSS_SERVICE_ALERT               3   //msgCtx = alert level
+#define BLE_EVBLEMSGID_SERVICE_ERROR                        4   //msgCtx = resultcode
+#define BLE_EVBLEMSGID_HTS_INDICATION_STATE                 5   //msgCtx = new indication state 0=off, 1=on
+#define BLE_EVBLEMSGID_HTS_INDICATION_CNF                   6   //msgCtx = not used
+#define BLE_EVBLEMSGID_BPS_INDICATION_STATE                 7   //msgCtx = new indication state 0=off, 1=on
+#define BLE_EVBLEMSGID_BPS_INDICATION_CNF                   8   //msgCtx = not used
+#define BLE_EVBLEMSGID_DISPLAY_PASSKEY                      9   //msgCtx = passcode to display
+#define BLE_EVBLEMSGID_NEW_BOND                             10  //msgCtx = connection handle
+#define BLE_EVBLEMSGID_AUTH_KEY_REQUEST                     11  //msgCtx = 1 for passkey, 2 for 16 byte OOB data
+#define BLE_EVBLEMSGID_HRS_NOTIFICATION_STATE               12  //msgCtx = new notification state 0=off, 1=on
+//#define FUTURE_USE                                          13
+#define BLE_EVBLEMSGID_CONN_PARMS_UPDATE                    14  //msgCtx = connection handle
+#define BLE_EVBLEMSGID_CONN_PARMS_UPDATE_FAIL               15  //msgCtx = connection handle
+#define BLE_EVBLEMSGID_CONN_TO_BONDED_MASTER                16  //msgCtx = connection handle
+#define BLE_EVBLEMSGID_UPDATED_BOND                         17  //msgCtx = connection handle
+#define BLE_EVBLEMSGID_ENCRYPTED                            18  //msgCtx = connection handle
+#define BLE_EVBLEMSGID_POWER_FAILURE_WARNING                19  //msgCtx = current supply voltage
+#define BLE_EVBLEMSGID_UNENCRYPTED                          20  //msgCtx = connection handle
+#define BLE_EVBLEMSGID_DEVICENAME_WRITE                     21  //msgCtx = connection handle 
+
+//BLE Alert Levels
+#define BLE_ALERT_LEVEL_NO_ALERT                            0
+#define BLE_ALERT_LEVEL_MILD_ALERT                          1
+#define BLE_ALERT_LEVEL_HIGH_ALERT                          2
+
+
+
+//Pairing i/o capability
+#define BLE_IOCAPABILITY_NONE                               0
+#define BLE_IOCAPABILITY_DISPLAY_YESNO                      1
+#define BLE_IOCAPABILITY_KEYBOARD_ONLY                      2
+#define BLE_IOCAPABILITY_DISPLAY_ONLY                       3
+#define BLE_IOCAPABILITY_KEYBOARD_DISPLAY                   4
+#define BLE_IOCAPABILITY_ILLEGAL                            5
+
+
+
+//HCI Status Codes
+#define BLE_HCI_AUTHENTICATION_FAILURE                      0x05
+#define BLE_HCI_CONNECTION_TIMEOUT                          0x08
+
+//Some Useful Result Codes to help with documentation
+#define RESCODE_BLE_SVC_REGISTERED                          0x6018
+
+
+//Disconnect Error Codes
+#define BT_HCI_STATUS_CODE_SUCCESS 							0x00
+#define BT_HCI_STATUS_CODE_UNKNOWN_BTLE_COMMAND 			0x01
+#define BT_HCI_STATUS_CODE_UNKNOWN_CONNECTION_IDENTIFIER	0x02
+#define BT_HCI_AUTHENTICATION_FAILURE 						0x05
+#define BT_HCI_STATUS_CODE_PIN_OR_LINKKEY_MISSING 			0x06
+#define BT_HCI_MEMORY_CAPACITY_EXCEEDED 					0x07
+#define BT_HCI_CONNECTION_TIMEOUT 							0x08
+#define BT_HCI_STATUS_CODE_COMMAND_DISALLOWED 				0x0C
+#define BT_HCI_STATUS_CODE_INVALID_BTLE_COMMAND_PARAMETERS	0x12
+#define BT_HCI_REMOTE_USER_TERMINATED_CONNECTION			0x13
+#define BT_HCI_REMOTE_DEV_TERMINATION_DUE_TO_LOW_RESOURCES	0x14
+#define BT_HCI_REMOTE_DEV_TERMINATION_DUE_TO_POWER_OFF		0x15
+#define BT_HCI_LOCAL_HOST_TERMINATED_CONNECTION				0x16
+#define BT_HCI_UNSUPPORTED_REMOTE_FEATURE					0x1A
+#define BT_HCI_STATUS_CODE_INVALID_LMP_PARAMETERS 			0x1E
+#define BT_HCI_STATUS_CODE_UNSPECIFIED_ERROR 				0x1F
+#define BT_HCI_STATUS_CODE_LMP_RESPONSE_TIMEOUT 			0x22
+#define BT_HCI_STATUS_CODE_LMP_PDU_NOT_ALLOWED 				0x24
+#define BT_HCI_INSTANT_PASSED 								0x28
+#define BT_HCI_PAIRING_WITH_UNIT_KEY_UNSUPPORTED 			0x29
+#define BT_HCI_DIFFERENT_TRANSACTION_COLLISION 				0x2A
+#define BT_HCI_CONTROLLER_BUSY 								0x3A
+#define BT_HCI_CONN_INTERVAL_UNACCEPTABLE					0x3B
+#define BT_HCI_DIRECTED_ADVERTISER_TIMEOUT					0x3C
+#define BT_HCI_CONN_TERMINATED_DUE_TO_MIC_FAILURE			0x3D
+#define BT_HCI_CONN_FAILED_TO_BE_ESTABLISHED				0x3E
+
+
+
+//******************************************************************************
+// 			Hata İşleyiciler (Error Handler as early as possible)	(Begin Code)
+//******************************************************************************
+sub HandlerOnErr()
+	//if (ENABLE_DEBUG_PRINTS == TRUE) then
+		print "\n OnErr - ";GetLastError();"\n"
+	//endif
+endsub
+onerror next HandlerOnErr
+
+
+sub AssertRC(byval rc as integer,byval tag as integer)
+	if (ENABLE_DEBUG_PRINTS == TRUE) && (rc!=0) then
+		print "Ble Failed with ";integer.h' rc;" at tag ";tag;"\n"
+	endif
+endsub
+
+
+
+sub DbgPrnAdvReport(byref rp$ as string)
+	if (ENABLE_DEBUG_PRINTS == TRUE) then
+		//print "Rpt=";strhexize$(rp$);"\n"
+	endif
+endsub
+
+//******************************************************************************
+// 			Hata İşleyiciler (Error Handler as early as possible)	(End Code)
+//******************************************************************************
+
+
+
+//******************************************************************************
+// 			Global Variable Declarations	(Begin Code)
+//******************************************************************************
+
+dim msg$
+dim dt$
+dim advFlags                //Value for flags AD
+dim rc
+
+dim advState                  //Will be 0 if not advertising, 1,2,3,4 for the four advert types
+dim advType                   //As per ADV_ in ble.sblib
+dim addr$                     //Peer address for Directed Adverts (MSB first) and exactly 6 bytes long
+dim advInt                    //Adv interval in milliseconds
+dim advTmout                  //Adv timeout in milliseconds
+dim advFilPol                 //Adv filter policy - see ADV_FILTERPOLICY_xxx in blelib.sblib
+                              // 0 = Any
+                              // 1 = Filter Scan Request
+                              // 2 = Filter Connection Request
+                              // 3 = Both
+							  
+dim adRpt$ as string          //Contains the most recent Advertise report
+dim scRptt$ as string          //Contains the most recent scan report
+dim advUuid[6]                //These are the uuid's that are exposed
+dim advUuidCnt                //Uuid Counts for advert report
+
+dim minint                    //Minimum interval range is 7500us to 4000000us
+dim maxint                    //Minimum interval range is 7500us to 4000000us
+dim sprtout                   //Link supervision timeout max value 32000000us
+dim slatncy                   //Slave latency 0..N where N*Interval must be less than link
+                              //Supervision timeout
+dim hConn                     //Connection handle
+
+
+dim shHts as integer          //Service handle
+dim chHtsMeas as integer      //Health Temperature Measurement Characteristic Handle
+
+dim indState                  //Indication state 0 = off, 1 = on
+dim indwait                   //0 means not waiting for an indication confirm
+dim tempMant                  //Temperature mantissa
+dim tempExp                   //Termperature exponant
+dim fUnits                    //Units -- 0 = Centigrade, 1 = Fahrenheit
+dim dateTime$ as string       //Date Time string -- must be 0 or 7 bytes long
+dim hts$ as string            //hts measurement attribute
+dim tmpType                   //Sensor location/type
+
+
+//dim msg$
+dim mnltk                     //Min size of ltk
+dim mxltk                     //Max size of ltk
+//dim advFlags                  //Value for flags AD
+
+
+dim IMU_hsvc		// IMU service handle
+dim IMU_ch 			// IMU characteristic handle
+
+
+// dim BleConnectState : BleConnectState=0
+// dim SendEnable : SendEnable=0
+
+
+
+//******************************************************************************
+// 			Global Variable Declarations	(End Code)
+//******************************************************************************
+
+
+
+//******************************************************************************
+// 			Initialise Global Variable		(Begin Code)
+//******************************************************************************
+
+advState = 0
+advType  = ADV_IND
+addr$ = ""
+advInt   = ADV_INTERVAL_MS
+advTmout = ADV_TIMEOUT_MS
+advFilPol= ADV_WHITELIST_FILTER_POLICY
+
+adRpt$=""
+scRptt$=""
+
+//Initialise the uuid array list with -1 which will be taken as item not to
+//to be included in the advert report for the uuid AD element.
+for advUuidCnt=0 to 5
+  advUuid[advUuidCnt]=-1
+next
+advUuidCnt = 0
+
+hConn   = BLE_CONN_HANDLE_INVALID
+minint  = MIN_CONN_INTERVAL
+maxint  = MAX_CONN_INTERVAL
+sprtout = CONN_SUP_TIMEOUT
+slatncy = SLAVE_LATENCY
+
+indwait         = 0
+indState        = 0
+
+tempMant        = 0
+tempExp         = 0
+
+fUnits          = 0
+dateTime$       = ""
+
+
+
+mnltk    = MIN_LTK_SIZE
+mxltk    = MAX_LTK_SIZE
+advFlags = DISCOVERY_MODE    //Can be changed via 'fg' command
+
+
+
+
+
+
+//******************************************************************************
+// 			Initialise Global Variable		(End Code)
+//******************************************************************************
+
+
+
+//******************************************************************************
+//			Function and Subroutine definitions		(Begin Code)
+//******************************************************************************
+
+
+// bknz: 171. Kod Satırı
+function SetAdvertType(byval adType as integer,byref ad$ as string) as integer
+	if (adType <= ADV_IND) && (adType <= ADV_NONCONN_IND) then
+		if (adType==ADV_DIRECT_IND) then
+			if (strlen(ad$)!=6)  then
+				exitfunc 0
+			endif
+			
+			addr$=ad$
+		endif
+		
+		advType = adType
+		exitfunc 1
+	endif
+endfunc 0
+
+// Advertise durumunu öğrenme.
+function GetAdvertState() as integer
+endfunc advState
+
+// Advertise inverval değerini belirler
+function SetAdvertInterval(intvl as integer) as integer
+	if intvl < 20 then
+		exitfunc 0
+	endif
+	
+	if advType >= ADV_SCAN_IND then
+		if intvl < 100 then
+			exitfunc 0
+		endif
+	endif
+	advInt = intvl
+endfunc 1
+
+// Advertise Timeout değerini belirler
+function SetAdvertTimeout(inttm as integer) as integer
+	if inttm < (advInt+20) then
+		exitfunc 0
+	endif
+	
+	advTmout = inttm
+endfunc 1
+
+
+function SetAdvertFPol(fpol as integer) as integer
+	if (fpol >= ADV_FILTERPOLICY_ANY)&&(fpol <= ADV_FILTERPOLICY_BOTH)then
+		advFilPol = fpol
+		exitfunc 1
+	endif
+endfunc 0
+
+
+//==============================================================================
+// -1 for the last valid type of advert that was sent
+//  0 ADV_IND
+//  1 ADV_DIRECT_IND
+//  2 ADV_SCAN_IND
+//  3 ADV_NONCONN_IND
+//
+// Returns 0 if successful, otherwise appropriate error code
+//==============================================================================
+function StartAdverts(adv as integer) as integer
+	dim rc
+	
+	if advState == 0 then
+	
+		//Currently not advertising
+		if adv == -1 then
+			adv = advType
+		elseif (adv<0)||(adv>3) then
+			//Invalid advertising type
+			rc=0xEF01
+			AssertRC(rc, 500)
+			exitfunc rc
+		endif
+		
+		rc = BleAdvertStart(adv,addr$,advInt,advTmout,advFilPol)	: AssertRC(rc, 505)
+		
+		//
+		//Warning: If you get an error here it is most likely that you
+		//         have limited discoverability and the advert timeout is > 180000
+		//
+		
+		if rc==0 then
+			//Adverts started successfully
+			advType = adv
+			advState = advType + 1
+		endif
+	else
+	
+		//Currently advertising
+		rc=0xEF00
+		AssertRC(rc, 520)
+	endif
+	
+endfunc rc
+
+
+function StopAdverts() as integer
+	dim rc : rc = 0
+	
+	if advState != 0 then
+		//Currently advertising
+		rc = BleAdvertStop()	: AssertRC(rc, 533)
+		
+		if rc==0 then
+			//Adverts stopped successfully
+			advState=0
+		endif
+	endif
+endfunc rc
+
+
+//==============================================================================
+// MUST be called from the BLE message handler
+//==============================================================================
+sub AdvMngrOnBleMsg(BYVAL nMsgId AS INTEGER, BYVAL nCtx AS INTEGER)
+	dim rc
+
+	select nMsgId
+		case BLE_EVBLEMSGID_CONNECT
+			advState=0
+
+		case BLE_EVBLEMSGID_DISCONNECT
+			//Restart advertising
+			rc=StartAdverts(-1)
+			AssertRC(rc, 556)
+
+		case else
+			//Do nothing
+	endselect
+endsub
+
+
+//==============================================================================
+// Will return 0 if no longer advertising
+//==============================================================================
+function AdvMngrOnAdvTimeOut() as integer
+	advState = 0
+endfunc advState
+
+
+//==============================================================================
+// Will add to array if there is space
+//==============================================================================
+sub AddUuid(nUuid as integer)
+	if advUuidCnt < 5 then
+		advUuid[advUuidCnt]=nUuid
+		advUuidCnt = advUuidCnt + 1
+	endif
+endsub
+
+
+//==============================================================================
+// advFlags = Flags for Advert Report
+//==============================================================================
+sub InitAdvReports(advFlags as integer)
+	dim rc
+
+	adRpt$="nusret"
+	scRptt$="yilmaz"
+
+	//If whitelist filter policy is enabled and there is at least one master
+	//in the bonding manager, then need to reset the advFlags so that
+	//discoverability is disabled
+	if advFilPol != ADV_FILTERPOLICY_ANY then
+		//Filter policy has been enabled
+		if sysinfo(2009) != 0 then
+			//There is at least one master in the trusted device database
+			advFlags = advFlags & 0xFFFFFFFC
+		endif
+	endif
+
+	//Create a minimal advertise report
+	rc = BleAdvRptInit(adRpt$,advFlags,ADV_APPEARANCE,MAX_DEVNAME_CHRS)
+	AssertRC(rc, 663)
+
+	//Append the uuid list to the advert report
+	rc = BleAdvRptAddUuid16(adRpt$,advUuid[0],advUuid[1],advUuid[2],advUuid[3],advUuid[4],advUuid[5])
+	AssertRC(rc, 609)
+
+	//Initialise an empty scan report
+	rc = BleScanRptInit(scRptt$)
+	AssertRC(rc, 613)
+
+	//Commit the advert and scan report to the scan
+	rc = BleAdvRptsCommit(adRpt$,scRptt$)
+	AssertRC(rc, 617)
+endsub
+
+
+//==============================================================================
+// hc is the handle of the connection to be dropped
+//==============================================================================
+// function Disconnect(hc as integer) as integer
+	// dim rc
+	// rc = BleDisconnect(hc)
+	// AssertRC(rc, 627)
+// endfunc rc
+
+
+//==============================================================================
+// hc is the handle of the connection to be dropped
+//==============================================================================
+// function ConnNewParms(hc as integer) as integer
+	// dim rc
+	// rc = BleSetCurConnParms(hc,minint,maxint,sprtout,slatncy)
+	// AssertRC(rc, 637)
+// endfunc rc
+
+
+
+//==============================================================================
+// MUST be called from the BLE message handler
+//==============================================================================
+sub ConnMngrOnBleMsg(BYVAL nMsgId AS INTEGER, BYVAL nCtx AS INTEGER)
+	select nMsgId
+		case BLE_EVBLEMSGID_CONNECT
+			hConn = nCtx
+
+		case BLE_EVBLEMSGID_DISCONNECT
+			hConn = BLE_CONN_HANDLE_INVALID
+
+		case else
+			//Do nothing
+	endselect
+endsub
+
+
+// Not: APPEARANCE parametresini değiştirmek gerekebilir
+sub InitGapService()
+	dim rc
+	rc = BleGapSvcInit(DEVICENAME, DEVICENAME_WRITABLE, APPEARANCE, MIN_CONN_INTERVAL, MAX_CONN_INTERVAL, CONN_SUP_TIMEOUT, SLAVE_LATENCY)
+	AssertRC(rc, 662)
+endsub
+
+
+sub InitDisService()
+	dim mf$,md$,sy$,rl$
+	dim rc
+
+	mf$=MANF_NAME	// Cihaz üreticisi. Gönderimi atlamak için boş olarak ayarlanabilir.
+	md$=MODELSTR	// Cihaz model numarası. Gönderimi atlamak için boş olarak ayarlanabilir.	
+	rl$=REGLIST		// Şartnamede tanımlanan cihazın yasal sertifika veri listesi. Gönderimi atlamak için boş bir dize olarak ayarlanabilir.
+	sy$=SYSID		// Spesifikasyonlarda tanımlandığı şekilde cihaz sistemi kimliği. Gönderimi atlamak için boş olarak ayarlanabilir.
+	//@SERIALNUM: 	The device serial number. Can be set empty to omit submission.
+	//@HWREV:		Aygıt donanım revizyon dizesi. Gönderimi atlamak için boş olarak ayarlanabilir.
+	//@SWREV:		Aygıt yazılımı revizyon dizesi. Gönderimi atlamak için boş olarak ayarlanabilir.
+	//@PNPID:		Şartnamede tanımlanan cihazın tak ve çalıştır kimliği. Gönderimi atlamak için boş olarak ayarlanabilir.
+	rc = BleSvcRegDevInfo(mf$,md$,SERIALNUM,HWREV,SWREV,sy$,rl$,PNPID)
+
+	if (rc==0) || (rc==RESCODE_BLE_SVC_REGISTERED) then
+		AddUuid(UUID_DEVICE_INFORMATION_SERVICE)
+	else
+		AssertRC(rc, 683)
+	endif
+endsub
+// Ayrıntı bilgi için bknz: CS-GUIDE-smartBASICEXT-BL652 v28_10_7_2.pdf  Sayfa: 154
+
+
+
+
+//******************************************************************************
+//			Creat Service and Characteristics		(Begin Code)
+//******************************************************************************
+
+// Ble Creat Characteristics
+function IMU_AddChar() as integer
+	DIM rc
+	DIM attr$ : attr$="Hi"
+
+	DIM mdAttr
+	DIM mdCccd
+	DIM mdSccd
+	DIM chProp 
+	
+	
+	//************************  RX  ***********************
+	
+	// mdAttr = BleAttrMetaData(1,1,20,0,rc)
+	// mdCccd = BleAttrMetadata(1,1,20,0,rc)
+	mdAttr = BleAttrMetaData(1,1,20,0,rc)
+	mdCccd = BleAttrMetadata(1,1,20,0,rc)
+	mdSccd = BLE_CHAR_METADATA_ATTR_NOT_PRESENT
+	chProp = BLE_CHAR_PROPERTIES_WRITE + BLE_CHAR_PROPERTIES_WRITE_WO_RESPONSE + BLE_CHAR_PROPERTIES_READ + BLE_CHAR_PROPERTIES_NOTIFY
+	rc=BleCharNew(chProp, BleHandleUuid16(2), mdAttr, 0, mdSccd)	: AssertRC(rc, 728)
+	//rc=BleCharNew(chProp, BleHandleUuid16(2), BleAttrMetaData(1,1,20,0,rc), 0, 0)	: AssertRC(rc, 728)
+	
+	rc=BleCharCommit(IMU_hsvc,attr$,BleCharRx)	: AssertRC(rc, 733)
+	
+	
+	
+	//************************  TX  ***********************
+	mdAttr = BleAttrMetadata(1,0,20,0,rc)	: AssertRC(rc, 740)
+	mdCccd = BleAttrMetadata(1,1,20,0,rc)	: AssertRC(rc, 742)
+	mdSccd = BLE_CHAR_METADATA_ATTR_NOT_PRESENT
+	chProp = BLE_CHAR_PROPERTIES_NOTIFY + BLE_CHAR_PROPERTIES_READ
+	rc=BleCharNew(chProp, BleHandleUuid16(3), mdAttr, mdCccd, mdSccd)	: AssertRC(rc, 746)
+	
+	rc=BleCharCommit(IMU_hsvc,attr$,BleCharTx)	: AssertRC(rc, 749)
+	
+endfunc rc
+
+
+// Ble Creat Service
+function IMU_CreatService() as integer
+	DIM rc
+
+	rc = BleServiceNew(BLE_SERVICE_PRIMARY,BleHandleUuid16(0x1010),IMU_hsvc)
+	AssertRC(rc, 727)
+
+	rc = IMU_AddChar()
+	AssertRC(rc, 731)
+
+	rc=BleServiceCommit(IMU_hsvc)
+	AssertRC(rc, 735)
+endfunc rc
+
+
+// Ble İnit Service
+sub IMU_InitService()
+	dim rc
+
+	rc = IMU_CreatService()
+	AssertRC(rc, 723)
+	if rc==0 then
+		AddUuid(0x1010)
+	endif
+endsub
+
+//******************************************************************************
+//			Creat Service and Characteristics		(End Code)
+//******************************************************************************
+
+
+
+
+sub OnStartup()
+	//InitSecurityMngr(PAIRING_IOCAPABILITY,MIN_LTK_SIZE, MAX_LTK_SIZE)
+
+	//Initialise services
+	InitGapService()
+	InitDisService()
+  
+	IMU_InitService()
+	
+
+	//Initiliase advert and scan reports
+	InitAdvReports(advFlags)
+endsub
+
+
+function StartAds(adv as integer) as integer
+	rc=StartAdverts(adv)
+	AssertRC(rc, 773)
+	if rc==0 then
+		//DbgMsgVal("Start Adverts",adv)
+		DbgMsg( "StartAdverts" )
+	endif
+endfunc rc
+
+
+
+
+
+
+
+
+
+
+//******************************************************************************
+//			Events Handler Functions		(Begin Code)
+//******************************************************************************
+
+// This handler is called when data has arrived at the serial port
+function HandlerBlrAdvTimOut() as integer
+	if AdvMngrOnAdvTimeOut() == 0 then
+
+		DbgMsg( "\nAdvert stopped via timeout" )
+		//DbgMsg( "\n   - could use SystemStateSet(0) to switch off" )
+
+		//------------------------------------------------------------
+		//  Switch off the system - requires a power cycle to recover
+		//------------------------------------------------------------
+		//  rc = SystemStateSet(0)
+		//  AssertRC(rc, 1127)
+	endif
+endfunc 1
+
+
+
+// This handler is called when there is a BLE message
+function HandlerBleMsg(BYVAL nMsgId AS INTEGER, BYVAL nCtx AS INTEGER) as integer
+	dim rc, ConnHandle, InterVal, SuperTout, SlaveLatency
+	//Inform libraries
+	ConnMngrOnBleMsg(nMsgId,nCtx)
+	AdvMngrOnBleMsg(nMsgId,nCtx)
+
+	select nMsgId
+		case BLE_EVBLEMSGID_CONNECT
+			DbgMsgVal(" --- Connect : ", nCtx)
+			BleConnected = true
+			BleConnHandle = nCtx
+			//rc = BleSetCurconnParms(nCtx, 7500,50000,100000,0)
+			rc = BleGetCurConnParms(BleConnHandle, InterVal, SuperTout, SlaveLatency)
+			BleConnInterVal = InterVal
+			
+		case BLE_EVBLEMSGID_DISCONNECT
+			indwait=0
+			DbgMsgVal(" --- Disconnect : ",nCtx)
+			BleConnected = false
+			//rc=BleConnRssiStart(nCtx,20,1)
+
+		case BLE_EVBLEMSGID_HTS_INDICATION_STATE
+			//DbgMsgVal(" +++ HTS IND STATE = ",nCtx)
+			//if nCtx == 1 then
+				//Indications have been enabled
+			//endif
+
+		case BLE_EVBLEMSGID_HTS_INDICATION_CNF
+			//DbgMsg(" +++ HTS IND CNF")
+			//Can send next measurement data
+
+		case BLE_EVBLEMSGID_DISPLAY_PASSKEY
+			//DbgMsgVal("Display Pairing Passkey ",nCtx)
+
+		case BLE_EVBLEMSGID_NEW_BOND
+			//DbgMsg(" +++ New Bond")
+
+		case BLE_EVBLEMSGID_UPDATED_BOND
+			//DbgMsg(" +++ Updated Bond")
+
+		case BLE_EVBLEMSGID_ENCRYPTED
+			//DbgMsg(" +++ Encrypted Connection")
+
+		case BLE_EVBLEMSGID_CONN_TO_BONDED_MASTER
+			//DbgMsgVal(" -- Conn to Bonded Master ",nCtx)
+
+		case BLE_EVBLEMSGID_AUTH_KEY_REQUEST
+			//DbgMsgVal(" +++ Auth Key Request, type=",nCtx)
+
+		case BLE_EVBLEMSGID_CONN_PARMS_UPDATE
+			//dim rc, ConnHandle, InterVal, SuperTout, SlaveLatency
+			ConnHandle = nCtx
+			//rc = BleGetCurConnParms(ConnHandle, InterVal, SuperTout, SlaveLatency)
+			//print "\ninterval: "; InterVal; "\nsupervison: "; SuperTout; "\nnSlaveLatency: "; SlaveLatency; "\n"
+			// if InterVal > 8000 then
+				// rc = BleSetCurconnParms(ConnHandle, 7500,10000,100000,0)
+			// endif
+			// if SuperTout < 1000000 then
+				// rc = BleSetCurconnParms(ConnHandle, 7500,10000,1000000,0)
+			// endif
+		case BLE_EVBLEMSGID_CONN_PARMS_UPDATE_FAIL
+			//DbgMsg(" ??? Conn Parm Negotiation FAILED")
+
+		case else
+			//DbgMsgVal("Unknown Ble Msg", nMsgId)
+	endselect
+endfunc 1
+
+
+
+
+
+// Ayrıntı bilgi için bknz: CS-GUIDE-smartBASICEXT-BL652 v28_10_7_2.pdf  Sayfa: 55 ve 353 
+// function HandlerDisconnect(byval hConn as integer, byval ErrorCode as integer)
+	
+	// select ErrorCode
+		// case BT_HCI_STATUS_CODE_SUCCESS
+			//DbgMsg("Disconnect: BT_HCI_STATUS_CODE_SUCCESS")
+		// case BT_HCI_STATUS_CODE_UNKNOWN_BTLE_COMMAND
+			//DbgMsg("Disconnect: BT_HCI_STATUS_CODE_UNKNOWN_BTLE_COMMAND")
+		// case  BT_HCI_STATUS_CODE_UNKNOWN_CONNECTION_IDENTIFIER
+			//DbgMsg("Disconnect: BT_HCI_STATUS_CODE_UNKNOWN_CONNECTION_IDENTIFIER")
+		// case  BT_HCI_AUTHENTICATION_FAILURE
+			//DbgMsg("Disconnect: BT_HCI_AUTHENTICATION_FAILURE")
+		// case  BT_HCI_STATUS_CODE_PIN_OR_LINKKEY_MISSING
+			//DbgMsg("Disconnect: BT_HCI_STATUS_CODE_PIN_OR_LINKKEY_MISSING")
+		// case  BT_HCI_MEMORY_CAPACITY_EXCEEDED
+			//DbgMsg("Disconnect: BT_HCI_MEMORY_CAPACITY_EXCEEDED")
+		// case  BT_HCI_CONNECTION_TIMEOUT
+			//DbgMsg("Disconnect: BT_HCI_CONNECTION_TIMEOUT")
+		// case  BT_HCI_STATUS_CODE_COMMAND_DISALLOWED
+			//DbgMsg("Disconnect: BT_HCI_STATUS_CODE_COMMAND_DISALLOWED")
+		// case  BT_HCI_STATUS_CODE_INVALID_BTLE_COMMAND_PARAMETERS
+			//DbgMsg("Disconnect: BT_HCI_STATUS_CODE_INVALID_BTLE_COMMAND_PARAMETERS")
+		// case  BT_HCI_REMOTE_USER_TERMINATED_CONNECTION
+			//DbgMsg("Disconnect: BT_HCI_REMOTE_USER_TERMINATED_CONNECTION")
+		// case  BT_HCI_REMOTE_DEV_TERMINATION_DUE_TO_LOW_RESOURCES
+			//DbgMsg("Disconnect: BT_HCI_REMOTE_DEV_TERMINATION_DUE_TO_LOW_RESOURCES")
+		// case  BT_HCI_REMOTE_DEV_TERMINATION_DUE_TO_POWER_OFF
+			//DbgMsg("Disconnect: BT_HCI_REMOTE_DEV_TERMINATION_DUE_TO_POWER_OFF")
+		// case  BT_HCI_LOCAL_HOST_TERMINATED_CONNECTION
+			//DbgMsg("Disconnect: BT_HCI_LOCAL_HOST_TERMINATED_CONNECTION")
+		// case  BT_HCI_UNSUPPORTED_REMOTE_FEATURE
+			// DbgMsg("Disconnect: BT_HCI_UNSUPPORTED_REMOTE_FEATURE")
+		// case  BT_HCI_STATUS_CODE_INVALID_LMP_PARAMETERS
+			// DbgMsg("Disconnect: BT_HCI_STATUS_CODE_INVALID_LMP_PARAMETERS")
+		// case  BT_HCI_STATUS_CODE_UNSPECIFIED_ERROR
+			// DbgMsg("Disconnect: BT_HCI_STATUS_CODE_UNSPECIFIED_ERROR")
+		// case  BT_HCI_STATUS_CODE_LMP_RESPONSE_TIMEOUT
+			// DbgMsg("Disconnect: BT_HCI_STATUS_CODE_LMP_RESPONSE_TIMEOUT")
+		// case  BT_HCI_STATUS_CODE_LMP_PDU_NOT_ALLOWED
+			// DbgMsg("isconnect: BT_HCI_STATUS_CODE_LMP_PDU_NOT_ALLOWED")
+		// case  BT_HCI_INSTANT_PASSED
+			// DbgMsg("Disconnect: BT_HCI_INSTANT_PASSED")
+		// case  BT_HCI_PAIRING_WITH_UNIT_KEY_UNSUPPORTED
+			// DbgMsg("Disconnect: BT_HCI_PAIRING_WITH_UNIT_KEY_UNSUPPORTED")
+		// case  BT_HCI_DIFFERENT_TRANSACTION_COLLISION
+			// DbgMsg("Disconnect: BT_HCI_DIFFERENT_TRANSACTION_COLLISION")
+		// case  BT_HCI_CONTROLLER_BUSY
+			// DbgMsg("Disconnect: BT_HCI_CONTROLLER_BUSY")
+		// case  BT_HCI_CONN_INTERVAL_UNACCEPTABLE
+			// DbgMsg("Disconnect: BT_HCI_CONN_INTERVAL_UNACCEPTABLE")
+		// case  BT_HCI_DIRECTED_ADVERTISER_TIMEOUT
+			// DbgMsg("Disconnect: BT_HCI_DIRECTED_ADVERTISER_TIMEOUT")
+		// case  BT_HCI_CONN_TERMINATED_DUE_TO_MIC_FAILURE
+			// DbgMsg("Disconnect: BT_HCI_CONN_TERMINATED_DUE_TO_MIC_FAILURE")
+		// case  BT_HCI_CONN_FAILED_TO_BE_ESTABLISHED
+			// DbgMsg("Disconnect: BT_HCI_CONN_FAILED_TO_BE_ESTABLISHED")
+		// case else
+	// endselect
+// endfunc 1
+
+
+function HandlerCharCccd(byval charHandle, byval nVal) AS INTEGER
+	if charHandle == BleCharTx then
+		print "BleCharTx "; "nVal: "; nVal; "\n"
+	elseif charHandle == BleCharRx then
+		print "BleCharRx "; "nVal: "; nVal; "\n"
+	else
+		print "Baska characteristic tutamacı"
+	endif
+endfunc 1
+
+//******************************************************************************
+//			Events Handler Functions		(End Code)
+//******************************************************************************
+
+
+
+
+
+//******************************************************************************
+//			Function and Subroutine definitions		(End Code)
+//******************************************************************************
+
+FUNCTION HndlrConnRssi(BYVAL charHandle, BYVAL rssi) AS INTEGER
+	PRINT "\nRSSI=";rssi;" for connection "; integer.h' charHandle
+ENDFUNC 1
+
+OnEvent  EVBLE_ADV_TIMEOUT  call HandlerBlrAdvTimOut
+OnEvent  EVBLEMSG           call HandlerBleMsg
+//OnEvent  EVMSGAPP           call HandlerMsgApp
+OnEvent  EVCHARCCCD         call HandlerCharCccd
+//OnEvent  EVCHARHVC          call HandlerCharHvc
+//OnEvent  EVBLE_PHY_UPDATED  call HandlerPhyChngd
+//OnEvent  EVBLE_PHY_REQUEST  call HandlerPhyReq
+// ONEVENT  EVCHARVAL   		call HandlerCharVal
+// ONEVENT  EVDISCON 			CALL HandlerDisconnect
+ONEVENT  EVCONNRSSI			CALL HndlrConnRssi
+
+
+//Create Advert packets and register services
+OnStartup()
+rc=StartAds(ADV_IND)
+
+
+
+
+
+
+// WAITEVENT
+

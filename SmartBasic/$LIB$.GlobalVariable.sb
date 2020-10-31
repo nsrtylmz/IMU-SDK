@@ -1,0 +1,185 @@
+
+#define true	1
+#define TRUE	1
+#define false	0
+#define FALSE 	0
+
+dim ENABLE_DEBUG_PRINTS
+ENABLE_DEBUG_PRINTS = TRUE
+
+dim SpiState : SpiState = FALSE
+
+dim FlashEnable : FlashEnable = FALSE
+dim FlashLastAddress : FlashLastAddress = 0
+dim FlashReadAddress : FlashReadAddress = 0
+dim AccelDataCount	: AccelDataCount = 0
+dim GyroDataCount	: GyroDataCount = 0
+dim MagnoDataCount	: MagnoDataCount = 0
+
+dim SeriPortEnable : SeriPortEnable = FALSE
+
+dim BleConnHandle
+dim BleConnInterVal
+
+dim BleConnected : BleConnected=0
+dim SendEnable : SendEnable=0
+
+dim BleEnable : BleEnable = TRUE
+dim BleCharRx
+dim BleCharTx
+dim BleCharTxEnable : BleCharTxEnable = true //false
+dim BleGettingData$
+
+dim AccOperationMode
+dim GyrOperationMode
+dim MagnoOperationMode
+dim MagnoActiveModPreset
+
+dim AccelEnable : AccelEnable=false
+dim GyroEnable	: GyroEnable=false
+dim MagnoEnable	: MagnoEnable=false
+dim AccelReadEnable : AccelReadEnable = false
+dim GyroReadEnable 	: GyroReadEnable = false
+dim MagnoReadEnable : MagnoReadEnable = false
+
+dim AccelReady 	: AccelReady = false
+dim GyroReady	: GyroReady = false
+dim MagnoReady	: MagnoReady = false
+
+dim AccelBw, AccelRange
+dim GyroBw, GyroRange
+dim MagnoBw
+
+dim AccelSelfTestResult
+dim GyroSelfTestResult
+dim MagnoSelfTestResult
+
+function IsConnected()
+endfunc BleConnected
+
+
+dim UartEnable
+dim UartOk : UartOk = true
+dim UartSendData$
+
+
+dim Timer2_timing : Timer2_timing = 1
+
+
+sub DbgMsg(byval msg$ as string)
+	if (ENABLE_DEBUG_PRINTS == TRUE ) then
+		print msg$;"\n"
+	endif
+endsub
+
+sub DbgMsgVal(byval msg$ as string, byval vl as integer)
+	if (ENABLE_DEBUG_PRINTS == TRUE) then
+		print msg$; " "; vl; "\n"
+	endif
+endsub
+
+
+sub bitSet(byref val as integer, byval bitNmbr as integer)
+	dim temp
+	
+	select bitNmbr
+		case 0
+			temp = val | 0x01
+		case 1
+			temp = val | 0x02
+		case 2
+			temp = val | 0x04
+		case 3
+			temp = val | 0x08
+		case 4
+			temp = val | 0x10
+		case 5
+			temp = val | 0x20
+		case 6
+			temp = val | 0x40
+		case 7
+			temp = val | 0x80
+		case else
+			temp = val
+	endselect
+	val = temp
+endsub
+
+sub bitClear(byref val as integer, byval bitNmbr as integer)
+	dim temp
+	
+	select bitNmbr
+		case 0
+			temp = val & 0xFE
+		case 1
+			temp = val & 0xFD
+		case 2
+			temp = val & 0xFB
+		case 3
+			temp = val & 0xF7
+		case 4
+			temp = val & 0xEF
+		case 5
+			temp = val & 0xDF
+		case 6
+			temp = val & 0xBF
+		case 7
+			temp = val & 0x7F
+		case else
+			temp = val
+	endselect
+	val = temp
+endsub
+
+
+function fonk(byval val as integer)
+	dim res
+	if val then
+		res = true
+	else
+		res = false
+	endif
+endfunc res
+
+function readBit(byval val as integer, byval bitNmbr as integer)
+	dim temp
+	
+	select bitNmbr
+		case 0
+			temp = fonk(val & 0x01)
+		case 1
+			temp = fonk(val & 0x02)
+		case 2
+			temp = fonk(val & 0x04)
+		case 3
+			temp = fonk(val & 0x08)
+		case 4
+			temp = fonk(val & 0x10)
+		case 5
+			temp = fonk(val & 0x20)
+		case 6
+			temp = fonk(val & 0x40)
+		case 7
+			temp = fonk(val & 0x80)
+		case else
+			temp = val
+	endselect	
+endfunc temp
+
+
+
+
+
+
+sub delay_ms(byval time as integer)
+	TimerStart(1,time,0)
+	while TimerRunning(1) != 0
+	endwhile
+endsub
+
+function HandlerTimer1()
+endfunc 1
+
+
+OnEvent EVTMR1	call HandlerTimer1
+

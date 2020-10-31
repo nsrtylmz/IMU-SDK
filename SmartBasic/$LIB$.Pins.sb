@@ -1,0 +1,159 @@
+
+
+//***** Pin Definitions (Begin) *************
+//Yeni modül
+#define SPI_clk		25		
+#define SPI_miso 	24		
+#define SPI_mosi  	23		
+
+#define bmx_cs1   	29		
+#define bmx_cs2   	27		
+#define bmx_cs3   	31		
+
+#define bmx_int1  	30	
+#define bmx_int3  	28		
+#define bmx_int4	15
+#define bmx_drdy  	26		
+
+//Eski modül
+// #define SPI_clk		25		// SIO25
+// #define SPI_miso 	24		// SIO24
+// #define SPI_mosi  	23		// SIO23
+
+// #define bmx_cs1   	15		// SIO15
+// #define bmx_cs2   	17		// SIO17
+// #define bmx_cs3   	30		// SIO30
+
+// #define bmx_int1  	19		// SIO19
+// #define bmx_int3  	31		// SIO31
+// #define bmx_int4	27
+// #define bmx_drdy  	29		// SIO29
+//***** Pin Definitions (End) ***************
+
+
+
+//***********************************************
+//      Pin I/O States (Begin)
+//***********************************************
+
+//***** nFunction (Begin)*****
+#define DIGITAL_IN 		1
+#define DIGITAL_OUT		2
+#define ANALOG_IN		3
+//***** nFunction (End)*******
+
+
+
+//***** nSubFunc (Begin) *****
+
+// If nFunction == DIGITAL_IN
+#define No_Pull_Resistors			0x00	//
+#define Pull_Down_Resistor_Weak		0x01	// (weak))
+#define Pull_Up_Resistor_Weak		0x02	// (weak))
+#define Pull_Down_Resistor_Strong	0x03	// (strong)
+#define Pull_Up_Resistor_Strong		0x04	// (strong)
+
+#define WakeUp_LOW					0x10	// When in deep sleep mode, awake when this pin is LOW
+#define WakeUp_HIGH					0x20	// When in deep sleep mode, awake when this pin is HIGH
+
+
+// If nFuncType == DIGITAL_OUT
+#define Initial_Output_to_LOW		0x00
+#define Initial_Output_to_HIGH		0x01
+#define Output_is_PWM				0x02
+
+// Ayrıntılı bilgi için bknz: CS-GUIDE-smartBASICEXT-BL652 v28_10_7_2.pdf	sayfa: 36
+//***** nSubFunc (End) *****
+
+
+#define LOW		0
+#define HIGH	1
+
+
+#define Rising_Edge		0
+#define Falling_Edge	1
+#define Toggle_Edge		2
+
+
+//dim nSigNum			// SIO pin munber
+//dim nFunction		//
+//dim nSubFunc		//
+
+//***********************************************
+//      Pin I/O States (End)
+//***********************************************
+
+
+
+
+//***********************************************
+//      Pin Functions (Begin)
+//***********************************************
+
+dim PinsAssertRCEnable
+PinsAssertRCEnable = FALSE
+
+sub PinsAssertRC(byval rc as integer,byval tag as integer)
+	if 1 && (rc!=0) then
+		print "Pins Failed with ";integer.h' rc;" at tag ";tag;"\n"
+	endif
+endsub
+
+
+//***** Pin setting *****
+function SetPinSIO(byval nSigNum_ as integer, byval nFunction_ as integer, byval nSubFunc_ as integer) as integer
+	dim rc : rc = GpioSetFunc(nSigNum_, nFunction_, nSubFunc_)
+endfunc rc
+
+//***** Read the pin *****
+// function GpioDigitalRead(byval nSigNum_ as integer) as integer
+	// dim value : value = GpioRead(nSigNum_)
+// endfunc value
+
+//***** Write the pin *****
+// sub GpioDigitalWrite(byval nSigNum_ as integer, byval nNewValue_ as integer)
+	// GpioWrite(nSigNum_, nNewValue_)
+// endsub
+
+//***** Pin toggle *****
+dim toggle : toggle = 0
+sub GpioPinToggle(byval nSigNum_ as integer)
+	toggle = !toggle
+	GpioWrite(nSigNum_, toggle)
+endsub
+
+dim toggle1 : toggle1 = 0
+sub GpioPinToggle1(byval nSigNum_ as integer)
+	toggle1 = !toggle1
+	GpioWrite(nSigNum_, toggle1)
+endsub
+
+dim toggle2 : toggle2 = 0
+sub GpioPinToggle2(byval nSigNum_ as integer)
+	toggle2 = !toggle2
+	GpioWrite(nSigNum_, toggle2)
+endsub
+
+dim toggle3 : toggle3 = 0
+sub GpioPinToggle3(byval nSigNum_ as integer)
+	toggle3 = !toggle3
+	GpioWrite(nSigNum_, toggle3)
+endsub
+
+//***********************************************
+//      Pin Functions (End)
+//***********************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
