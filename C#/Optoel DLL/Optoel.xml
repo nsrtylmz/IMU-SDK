@@ -34,6 +34,423 @@
             Bu event bağlanılan cihazla ilgili connection bilgilerini içerir.
             </summary>
         </member>
+        <member name="P:Optoel.Ble.DongleAddress">
+            <summary>
+            USB Dongle'ın Mac Address'i.
+            </summary>
+        </member>
+        <member name="P:Optoel.Ble.MaxSupportedConnections">
+            <summary>
+            Desteklenen max. cihaz sayısı.
+            </summary>
+        </member>
+        <member name="P:Optoel.Ble.IsOpen">
+            <summary>
+            Seriport açık mı?
+            </summary>
+        </member>
+        <member name="P:Optoel.Ble.ConnectMessage">
+            <summary>
+            Seriport bağlantı durum mesajı.
+            </summary>
+        </member>
+        <member name="M:Optoel.Ble.OpenAsync(System.String)">
+            <summary>
+            Seriportu açar. (BaudRade: 921600)
+            </summary>
+            <param name="Com"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Optoel.Ble.Open(System.String)">
+            <summary>
+             Seriportu açar. (BaudRade: 921600)
+            </summary>
+            <param name="Com"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Optoel.Ble.Close">
+            <summary>
+            Seriportu kapatır.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Optoel.Ble.DiscoverStart(System.Int32)">
+            <summary>
+            Scan işlemini başlatır. "Timeout" saniye cinsinden bir parametredir.
+            "Timeout = 0" ise scan işlemini durdurmak için "DiscoverStop" methodu kullanılmalı.
+            "Timeout" sıfırdan farklı bir değer ise, Timeout süresi sonunda scan işlemi otomatik sonlandırılır.
+            </summary>
+            <param name="Timeout">(secand)</param>
+        </member>
+        <member name="M:Optoel.Ble.DiscoverStop">
+            <summary>
+            Scan işlemini sonlandırır.
+            </summary>
+        </member>
+        <member name="M:Optoel.Ble.ConnectToDevice(Optoel.Ble.Device)">
+            <summary>
+            Herhnagi bir Optoel cihazıyla bağlantı kurar.
+            </summary>
+            <param name="device"></param>
+        </member>
+        <member name="E:Optoel.Ble.BleDiscoverResult">
+            <summary>
+            Scan işlemi bittiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleDiscoverDeivce">
+            <summary>
+            Scan işlemi sırasında, her yeni Optoel cihazı keşfedildiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleConnectResult">
+            <summary>
+            Bir Optoel cihazıyla bağlantı kurulduğunda fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleErrorEvent">
+            <summary>
+            USB Dongle yada bluetooth hatası olduğunu belirtir.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.EnableResult">
+            <summary>
+             Bu event, Accelerometer/Gyroscope/Magnotometer  enable/disable yapıldığında fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BwResult">
+            <summary>
+            Accelerometer/Gyroscope/Magnotometer'ın çalışma frekansı değiştiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.RangeResult">
+            <summary>
+            Bu event, Accelerometer/Gyroscope/Magnotometer'ın range değeri değiştiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.ReadEnableResult">
+            <summary>
+            Bu event, Accelerometer/Gyroscope/Magnotometer'ın ReadEnable durumu dğiştiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.AccelData">
+            <summary>
+            Bu event, Accelerometer'dan yeni data geldiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.GyroData">
+            <summary>
+            Bu event, Gyroscope'dan yeni data geldiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.MagnoData">
+            <summary>
+            Bu event, Magnotometer'dan yeni data geldiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.DisConnected">
+            <summary>
+            Optoel cihazıyla bluetooth bağlantısı koptuğunda fırlatılır. 
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.SlaveError">
+            <summary>
+            Slave cıhaz ile ilgili herhnagi bir bluetooth hatası oluştuğunu belirtir.
+            </summary>
+        </member>
+        <member name="F:Optoel.Ble.BleSlave.MacAddress">
+            <summary>
+            Cihazın Mac. Adresi.
+            </summary>
+        </member>
+        <member name="P:Optoel.Ble.BleSlave.Connected">
+            <summary>
+            Cihaz ile bluetooth bağlantı durumu.
+            </summary>
+        </member>
+        <member name="M:Optoel.Ble.BleSlave.BleDisconnect">
+            <summary>
+            Optoel cihazı ile bluetooth bağlantısını sonlandırır.
+            </summary>
+        </member>
+        <member name="M:Optoel.Ble.BleSlave.SetEnable(Optoel.BMX055.Sensor,Optoel.BMX055.Enable)">
+            <summary>
+            Accelerometer, Gyroscope, Magnotometer'ı aktif/pasif eder. Bu komut sonucunda "SlaveEnableResult" eventi fırlatılır.<para/>
+            Disable: Derin Uyku Modu. (min. güç tüketimi)<para/>
+            Enable:  Bekleme Modu ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
+            </summary>
+            <param name="Sensor"></param>
+            <param name="Enable"></param>
+        </member>
+        <member name="M:Optoel.Ble.BleSlave.SetBw(Optoel.BMX055.Sensor,System.Enum)">
+            <summary>
+            Accelerometer/Gyroscope/Magnotometer'ın okuma frekansını ayarlar. Bu komut sonucunda "SlaveBwResult" eventi fırlatılır.
+            </summary>
+            <param name="Sensor"></param>
+            <param name="Bw"></param>
+        </member>
+        <member name="M:Optoel.Ble.BleSlave.SetRange(Optoel.BMX055.Sensor,System.Enum)">
+            <summary>
+            Accelerometer/Gyroscope'un çalışma aralığını (range) ayarlar. Bu komut sonucunda "SlaveRangeResult" eventi fırlatılır.
+            </summary>
+            <param name="Sensor"></param>
+            <param name="Range"></param>
+        </member>
+        <member name="M:Optoel.Ble.BleSlave.SetReadEnable(Optoel.BMX055.Sensor,Optoel.BMX055.Enable)">
+            <summary>
+            Accelerometer/Gyroscope/Magnotometer'ın okuma özelliğini aktif/pasif eder. Bu komuttan önce "SetEnable(Sensor, Enable)" komutuyla Accelerometer//Gyroscope/Magnotometer aktif edilmiş olmalıdır.<para/>
+            Enable: "Run Modu" (max. güç tüketimi)<para/>
+            Disable: "Bekleme Modu" ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
+            </summary>
+            <param name="Sensor"></param>
+            <param name="Enable"></param>
+        </member>
+        <member name="M:Optoel.Ble.BleSlave.Start(Optoel.BMX055.Enable,Optoel.BMX055.Enable,Optoel.BMX055.Enable)">
+            <summary>
+            Aktif edilmiş sensörlerden, verilerin gönerilmesini başlatır.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Optoel.Ble.BleSlave.Stop">
+            <summary>
+            Aktif edilmiş sönserlerden, verilerin gönderilmesini durdurur.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.SlaveEnableResult">
+            <summary>
+            Bu event, Accelerometer/Gyroscope/Magnotometer  enable/disable yapıldığında fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.SlaveBwResult">
+            <summary>
+            Accelerometer/Gyroscope/Magnotometer'ın çalışma frekansı değiştiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.SlaveRangeResult">
+            <summary>
+            Bu event, Accelerometer/Gyroscope/Magnotometer'ın range değeri değiştiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.SlaveReadEnableResult">
+            <summary>
+            Bu event, Accelerometer/Gyroscope/Magnotometer'ın ReadEnable durumu dğiştiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.AccelData">
+            <summary>
+            Bu event, Accelerometer'dan yeni data geldiğinde fırlatılır.
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.GyroData">
+            <summary>
+            Bu event, Gyroscope'dan yeni data geldiğinde fırlatılır. 
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.MagnoData">
+            <summary>
+            Bu event, Magnotometer'dan yeni data geldiğinde fırlatılır. 
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.SlaveDisconnected">
+            <summary>
+            Optoel cihazıyla bluetooth bağlantısı koptuğunda fırlatılır. 
+            </summary>
+        </member>
+        <member name="E:Optoel.Ble.BleSlave.Error">
+            <summary>
+            Slave cıhaz ile ilgili herhnagi bir bluetooth hatası oluştuğunu belirtir.
+            </summary>
+        </member>
+        <member name="T:Optoel.BMX055.AccelBw">
+            <summary>
+            Accelerometer okuma hızları.
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.AccelBw.AccelBw_15f625">
+            <summary>
+            15.62 Hz (64 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.AccelBw.AccelBw_31f25">
+            <summary>
+            31.25 Hz (32 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.AccelBw.AccelBw_62f5">
+            <summary>
+            62.5 Hz (16 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.AccelBw.AccelBw_125">
+            <summary>
+            125 Hz (8 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.AccelBw.AccelBw_250">
+            <summary>
+            250 Hz (4 ms)
+            </summary>
+        </member>
+        <member name="T:Optoel.BMX055.GyroBw">
+            <summary>
+            Gyroscope okuma hızları.
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.GyroBw.GyroBw_100Hz">
+            <summary>
+            100 Hz (10 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.GyroBw.GyroBw_200Hz">
+            <summary>
+            200 Hz (5 ms)
+            </summary>
+        </member>
+        <member name="T:Optoel.BMX055.MagnoBw">
+            <summary>
+            Magnetometer okuma hızları.
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_2Hz">
+            <summary>
+            2 Hz (500 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_6Hz">
+            <summary>
+            6 Hz (166 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_8Hz">
+            <summary>
+            8 Hz (125 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_10Hz">
+            <summary>
+            10 Hz (100 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_15Hz">
+            <summary>
+            15 Hz (66 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_20Hz">
+            <summary>
+            20 Hz (50 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_25Hz">
+            <summary>
+            25 Hz (40 ms)
+            </summary>
+        </member>
+        <member name="F:Optoel.BMX055.MagnoBw.MagnoBw_30Hz">
+            <summary>
+            30 Hz (33 ms)
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:Optoel.Madgwick.SamplePeriod" -->
+        <member name="P:Optoel.Madgwick.Beta">
+            <summary>
+            Gets or sets the algorithm gain beta.
+            </summary>
+        </member>
+        <member name="P:Optoel.Madgwick.Quaternion">
+            <summary>
+            Gets or sets the Quaternion output.
+            </summary>
+        </member>
+        <member name="M:Optoel.Madgwick.#ctor(System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="!:MadgwickAHRS"/> class.
+            </summary>
+            <param name="samplePeriod">
+            Sample period.
+            </param>
+        </member>
+        <member name="M:Optoel.Madgwick.#ctor(System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="!:MadgwickAHRS"/> class.
+            </summary>
+            <param name="samplePeriod">
+            Sample period.
+            </param>
+            <param name="beta">
+            Algorithm gain beta.
+            </param>
+        </member>
+        <member name="M:Optoel.Madgwick.Update(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Algorithm AHRS update method. Requires only gyroscope and accelerometer data.
+            </summary>
+            <param name="gx">
+            Gyroscope x axis measurement in radians/s.
+            </param>
+            <param name="gy">
+            Gyroscope y axis measurement in radians/s.
+            </param>
+            <param name="gz">
+            Gyroscope z axis measurement in radians/s.
+            </param>
+            <param name="ax">
+            Accelerometer x axis measurement in any calibrated units.
+            </param>
+            <param name="ay">
+            Accelerometer y axis measurement in any calibrated units.
+            </param>
+            <param name="az">
+            Accelerometer z axis measurement in any calibrated units.
+            </param>
+            <param name="mx">
+            Magnetometer x axis measurement in any calibrated units.
+            </param>
+            <param name="my">
+            Magnetometer y axis measurement in any calibrated units.
+            </param>
+            <param name="mz">
+            Magnetometer z axis measurement in any calibrated units.
+            </param>
+            <remarks>
+            Optimised for minimal arithmetic.
+            Total ±: 160
+            Total *: 172
+            Total /: 5
+            Total sqrt: 5
+            </remarks> 
+        </member>
+        <member name="M:Optoel.Madgwick.Update(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Algorithm IMU update method. Requires only gyroscope and accelerometer data.
+            </summary>
+            <param name="gx">
+            Gyroscope x axis measurement in radians/s.
+            </param>
+            <param name="gy">
+            Gyroscope y axis measurement in radians/s.
+            </param>
+            <param name="gz">
+            Gyroscope z axis measurement in radians/s.
+            </param>
+            <param name="ax">
+            Accelerometer x axis measurement in any calibrated units.
+            </param>
+            <param name="ay">
+            Accelerometer y axis measurement in any calibrated units.
+            </param>
+            <param name="az">
+            Accelerometer z axis measurement in any calibrated units.
+            </param>
+            <remarks>
+            Optimised for minimal arithmetic.
+            Total ±: 45
+            Total *: 85
+            Total /: 3
+            Total sqrt: 3
+            </remarks>
+        </member>
         <member name="P:Optoel.Optoel.SerialPort.IsOpen">
             <summary>
             Seriport açık mı?
@@ -68,63 +485,63 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.AccelEnable(Optoel.Optoel.Enable)">
+        <member name="M:Optoel.Optoel.SerialPort.AccelEnable(Optoel.BMX055.Enable)">
             <summary>
             Accelerometer'ı aktif eder.
             </summary>
             <param name="enable"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.GyroEnable(Optoel.Optoel.Enable)">
+        <member name="M:Optoel.Optoel.SerialPort.GyroEnable(Optoel.BMX055.Enable)">
             <summary>
             Gyroscope'u aktif eder.
             </summary>
             <param name="enable"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.MagnoEnable(Optoel.Optoel.Enable)">
+        <member name="M:Optoel.Optoel.SerialPort.MagnoEnable(Optoel.BMX055.Enable)">
             <summary>
             Magnotometer'ı aktif eder.
             </summary>
             <param name="enable"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.AccelSetBw(Optoel.Optoel.AccelBw)">
+        <member name="M:Optoel.Optoel.SerialPort.AccelSetBw(Optoel.BMX055.AccelBw)">
             <summary>
             Accelerometer'ın okuma frekansını ayarlar.
             </summary>
             <param name="accelBw"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.GyroSetBw(Optoel.Optoel.GyroBw)">
+        <member name="M:Optoel.Optoel.SerialPort.GyroSetBw(Optoel.BMX055.GyroBw)">
             <summary>
             Gyroscope'un okuma frekansını ayarlar.
             </summary>
             <param name="gyroBw"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.MagnoSetBw(Optoel.Optoel.MagnoBw)">
+        <member name="M:Optoel.Optoel.SerialPort.MagnoSetBw(Optoel.BMX055.MagnoBw)">
             <summary>
             Magnotometer'ın okuma frekansını ayarlar.
             </summary>
             <param name="magnoBw"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.AccelSetRange(Optoel.Optoel.AccelRange)">
+        <member name="M:Optoel.Optoel.SerialPort.AccelSetRange(Optoel.BMX055.AccelRange)">
             <summary>
             Accelerometer'ın çalışma aralığını (range) ayarlar.
             </summary>
             <param name="accelRange"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.GyroSetRange(Optoel.Optoel.GyroRange)">
+        <member name="M:Optoel.Optoel.SerialPort.GyroSetRange(Optoel.BMX055.GyroRange)">
             <summary>
             Gyroscope'un çalışma aralığını (range) ayarlar.
             </summary>
             <param name="gyroRange"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.Start(Optoel.Optoel.Enable,Optoel.Optoel.Enable,Optoel.Optoel.Enable)">
+        <member name="M:Optoel.Optoel.SerialPort.Start(Optoel.BMX055.Enable,Optoel.BMX055.Enable,Optoel.BMX055.Enable)">
             <summary>
             Aktif edilmiş sensörlerden, verilerin gönerilmesini başlatır.
             </summary>
@@ -135,441 +552,6 @@
             Aktif edilmiş sönserlerden, verilerin gönderilmesini durdurur.
             </summary>
             <returns></returns>
-        </member>
-        <member name="P:Optoel.Optoel.Ble.DongleAddress">
-            <summary>
-            USB Dongle'ın Mac Address'i.
-            </summary>
-        </member>
-        <member name="P:Optoel.Optoel.Ble.MaxSupportedConnections">
-            <summary>
-            Desteklenen max. cihaz sayısı.
-            </summary>
-        </member>
-        <member name="P:Optoel.Optoel.Ble.IsOpen">
-            <summary>
-            Seriport açık mı?
-            </summary>
-        </member>
-        <member name="P:Optoel.Optoel.Ble.ConnectMessage">
-            <summary>
-            Seriport bağlantı durum mesajı.
-            </summary>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.OpenAsync(System.String)">
-            <summary>
-            Seriportu açar. (BaudRade: 921600)
-            </summary>
-            <param name="Com"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.Close">
-            <summary>
-            Seriportu kapatır.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.DiscoverStart(System.Int32)">
-            <summary>
-            Scan işlemini başlatır. "Timeout" saniye cinsinden bir parametredir.
-            "Timeout = 0" ise scan işlemini durdurmak için "DiscoverStop" methodu kullanılmalı.
-            "Timeout" sıfırdan farklı bir değer ise, Timeout süresi sonunda scan işlemi otomatik sonlandırılır.
-            </summary>
-            <param name="Timeout">(secand)</param>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.DiscoverStop">
-            <summary>
-            Scan işlemini sonlandırır.
-            </summary>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.ConnectToDevice(Optoel.Optoel.Ble.Device)">
-            <summary>
-            Herhnagi bir Optoel cihazıyla bağlantı kurar.
-            </summary>
-            <param name="device"></param>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleDiscoverResult">
-            <summary>
-            Scan işlemi bittiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleDiscoverDeivce">
-            <summary>
-            Scan işlemi sırasında, her yeni Optoel cihazı keşfedildiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleConnectResult">
-            <summary>
-            Bir Optoel cihazıyla bağlantı kurulduğunda fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleErrorEvent">
-            <summary>
-            USB Dongle yada bluetooth hatası olduğunu belirtir.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.AccelEnableResult">
-            <summary>
-            Bu event, Accelerometer enable/disable yapıldığında fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.GyroEnableResult">
-            <summary>
-            Bu event, Gyroscope enable/disable yapıldığında fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.MagnoEnableResult">
-            <summary>
-            Bu event, Magnotometer enable/disable yapıldığında fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.AccelBwResult">
-            <summary>
-            Bu event, Accelerometer'ın çalışma frekansı değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.GyroBwResult">
-            <summary>
-            Bu event, Gyroscope'un çalışma frekansı değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.MagnoBwResult">
-            <summary>
-            Bu event, Magnotometer'ın çalışma frekansı değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.AccelRangeResult">
-            <summary>
-            Bu event, Accelerometer'ın range değeri değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.GyroRangeResult">
-            <summary>
-            Bu event, Gyroscope'un range değeri değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.AccelReadEnableResult">
-            <summary>
-            Bu event, Accelerometer'ın ReadEnable durumu dğiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.GyroReadEnableResult">
-            <summary>
-            Bu event, Gyroscope'un ReadEnable durumu dğiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.MagnoReadEnableResult">
-            <summary>
-            Bu event, Magnotometer'ın ReadEnable durumu dğiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.AccelData">
-            <summary>
-            Bu event, Accelerometer'dan yeni data geldiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.GyroData">
-            <summary>
-            Bu event, Gyroscope'dan yeni data geldiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.MagnoData">
-            <summary>
-            Bu event, Magnotometer'dan yeni data geldiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.DisConnected">
-            <summary>
-            Optoel cihazıyla bluetooth bağlantısı koptuğunda fırlatılır. 
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.SlaveError">
-            <summary>
-            Slave cıhaz ile ilgili herhnagi bir bluetooth hatası oluştuğunu belirtir.
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.Ble.BleSlave.MacAddress">
-            <summary>
-            Cihazın Mac. Adresi.
-            </summary>
-        </member>
-        <member name="P:Optoel.Optoel.Ble.BleSlave.Connected">
-            <summary>
-            Cihaz ile bluetooth bağlantı durumu.
-            </summary>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.BleDisconnect">
-            <summary>
-            Optoel cihazı ile bluetooth bağlantısını sonlandırır.
-            </summary>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.AccelEnable(Optoel.Optoel.Enable)">
-            <summary>
-            Accelerometer'ı aktif/pasif eder. Bu komut sonucunda "SlaveAccelEnableResult" eventi fırlatılır.<para/>
-            Disable: Accelerometer "Derin Uyku" modundadır. (min. güç tüketimi)<para/>
-            Enable: Accelerometer "Bekleme" modundadır. ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
-            </summary>
-            <param name="enable"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.GyroEnable(Optoel.Optoel.Enable)">
-            <summary>
-            Gyroscope'u aktif/pasif eder. Bu komut sonucunda "SlaveGyroEnableResult" eventi fırlatılır.<para/>
-            Disable: Gyroscope "Derin Uyku" modundadır. (min. güç tüketimi)<para/>
-            Enable: Gyroscope "Bekleme" modundadır. ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
-            </summary>
-            <param name="enable"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.MagnoEnable(Optoel.Optoel.Enable)">
-            <summary>
-            Magnotometer'ı aktif/pasif eder. Bu komut sonucunda "SlaveMagnoEnableResult" eventi fırlatılır.<para/>
-            Disable: Magnotometer "Derin Uyku" modundadır. (min. güç tüketimi)<para/>
-            Enable: Magnotometer "Bekleme" modundadır. ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
-            </summary>
-            <param name="enable"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.AccelSetBw(Optoel.Optoel.AccelBw)">
-            <summary>
-            Accelerometer'ın okuma frekansını ayarlar. Bu komut sonucunda "SlaveAccelBwResult" eventi fırlatılır.
-            </summary>
-            <param name="accelBw"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.GyroSetBw(Optoel.Optoel.GyroBw)">
-            <summary>
-            Gyroscope'un okuma frekansını ayarlar. Bu komut sonucunda "SlaveGyroBwResult" eventi fırlatılır.
-            </summary>
-            <param name="gyroBw"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.MagnoSetBw(Optoel.Optoel.MagnoBw)">
-            <summary>
-            Magnotometer'ın okuma frekansını ayarlar. Bu komut sonucunda "SlaveMagnoBwResult" eventi fırlatılır.
-            </summary>
-            <param name="magnoBw"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.AccelSetRange(Optoel.Optoel.AccelRange)">
-            <summary>
-            Accelerometer'ın çalışma aralığını (range) ayarlar. Bu komut sonucunda "SlaveAccelRangeResult" eventi fırlatılır.
-            </summary>
-            <param name="accelRange"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.GyroSetRange(Optoel.Optoel.GyroRange)">
-            <summary>
-            Gyroscope'un çalışma aralığını (range) ayarlar. Bu komut sonucunda "SlaveGyroRangeResult" eventi fırlatılır.
-            </summary>
-            <param name="gyroRange"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.AccelReadEnable(Optoel.Optoel.Enable)">
-            <summary>
-            Accelerometer'ın okuma özelliğini aktif/pasif eder. Bu komuttan önce "AccelEnable(Enable.Enable)" komutuyla Accelerometer aktif edilmiş olmalıdır.<para/>
-            Enable: Accelerometer "Run" modundadır. (max. güç tüketimi)<para/>
-            Disable: Accelerometer "Bekleme" modundadır. ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
-            </summary>
-            <param name="enable"></param>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.GyroReadEnable(Optoel.Optoel.Enable)">
-            <summary>
-            Gyroscope'un okuma özelliğini aktif/pasif eder. Bu komuttan önce "GyroEnable(Enable.Enable)" komutuyla Gyroscope aktif edilmiş olmalıdır.<para/>
-            Enable: Gyroscope "Run" modundadır. (max. güç tüketimi)<para/>
-            Disable: Gyroscope "Bekleme" modundadır. ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
-            </summary>
-            <param name="enable"></param>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.MagnoReadEnable(Optoel.Optoel.Enable)">
-            <summary>
-            Magnotometer'ın okuma özelliğini aktif/pasif eder. Bu komuttan önce "MagnoEnable(Enable.Enable)" komutuyla Magnotometer aktif edilmiş olmalıdır.<para/>
-            Enable: Magnotometer "Run" modundadır. (max. güç tüketimi)<para/>
-            Disable: Magnotometer "Bekleme" modundadır. ("Derin Uyku" modundan biraz daha fazla güç tüketir.)
-            </summary>
-            <param name="enable"></param>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.Start(Optoel.Optoel.Enable,Optoel.Optoel.Enable,Optoel.Optoel.Enable)">
-            <summary>
-            Aktif edilmiş sensörlerden, verilerin gönerilmesini başlatır.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.Ble.BleSlave.Stop">
-            <summary>
-            Aktif edilmiş sönserlerden, verilerin gönderilmesini durdurur.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveAccelEnableResult">
-            <summary>
-            Bu event, Accelerometer enable/disable yapıldığında fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveGyroEnableResult">
-            <summary>
-            Bu event, Gyroscope enable/disable yapıldığında fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveMagnoEnableResult">
-            <summary>
-            Bu event, Magnotometer enable/disable yapıldığında fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveAccelBwResult">
-            <summary>
-            Bu event, Accelerometer'ın çalışma frekansı değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveGyroBwResult">
-            <summary>
-            Bu event, Gyroscope'un çalışma frekansı değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveMagnoBwResult">
-            <summary>
-            Bu event, Magnotometer'ın çalışma frekansı değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveAccelRangeResult">
-            <summary>
-            Bu event, Accelerometer'ın range değeri değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveGyroRangeResult">
-            <summary>
-            Bu event, Gyroscope'un range değeri değiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveAccelReadEnableResult">
-            <summary>
-            Bu event, Accelerometer'ın ReadEnable durumu dğiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveGyroReadEnableResult">
-            <summary>
-            Bu event, Gyroscope'un ReadEnable durumu dğiştiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveMagnoReadEnableResult">
-            <summary>
-            Bu event, Magnotometer'ın ReadEnable durumu dğiştiğinde fırlatılır. 
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.AccelData">
-            <summary>
-            Bu event, Accelerometer'dan yeni data geldiğinde fırlatılır.
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.GyroData">
-            <summary>
-            Bu event, Gyroscope'dan yeni data geldiğinde fırlatılır. 
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.MagnoData">
-            <summary>
-            Bu event, Magnotometer'dan yeni data geldiğinde fırlatılır. 
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.SlaveDisconnected">
-            <summary>
-            Optoel cihazıyla bluetooth bağlantısı koptuğunda fırlatılır. 
-            </summary>
-        </member>
-        <member name="E:Optoel.Optoel.Ble.BleSlave.Error">
-            <summary>
-            Slave cıhaz ile ilgili herhnagi bir bluetooth hatası oluştuğunu belirtir.
-            </summary>
-        </member>
-        <member name="T:Optoel.Optoel.AccelBw">
-            <summary>
-            Accelerometer okuma hızları.
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.AccelBw.AccelBw_15f625">
-            <summary>
-            15.62 Hz (64 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.AccelBw.AccelBw_31f25">
-            <summary>
-            31.25 Hz (32 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.AccelBw.AccelBw_62f5">
-            <summary>
-            62.5 Hz (16 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.AccelBw.AccelBw_125">
-            <summary>
-            125 Hz (8 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.AccelBw.AccelBw_250">
-            <summary>
-            250 Hz (4 ms)
-            </summary>
-        </member>
-        <member name="T:Optoel.Optoel.GyroBw">
-            <summary>
-            Gyroscope okuma hızları.
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.GyroBw.GyroBw_100Hz">
-            <summary>
-            100 Hz (10 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.GyroBw.GyroBw_200Hz">
-            <summary>
-            200 Hz (5 ms)
-            </summary>
-        </member>
-        <member name="T:Optoel.Optoel.MagnoBw">
-            <summary>
-            Magnetometer okuma hızları.
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_2Hz">
-            <summary>
-            2 Hz (500 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_6Hz">
-            <summary>
-            6 Hz (166 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_8Hz">
-            <summary>
-            8 Hz (125 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_10Hz">
-            <summary>
-            10 Hz (100 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_15Hz">
-            <summary>
-            15 Hz (66 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_20Hz">
-            <summary>
-            20 Hz (50 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_25Hz">
-            <summary>
-            25 Hz (40 ms)
-            </summary>
-        </member>
-        <member name="F:Optoel.Optoel.MagnoBw.MagnoBw_30Hz">
-            <summary>
-            30 Hz (33 ms)
-            </summary>
         </member>
     </members>
 </doc>
