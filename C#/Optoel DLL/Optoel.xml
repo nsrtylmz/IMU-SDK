@@ -451,103 +451,47 @@
             Total sqrt: 3
             </remarks>
         </member>
-        <member name="P:Optoel.Optoel.SerialPort.IsOpen">
+        <member name="P:Optoel.SerialPort.IsOpen">
             <summary>
             Seriport açık mı?
             </summary>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.Open(System.String)">
+        <member name="M:Optoel.SerialPort.OpenAsync(System.String)">
             <summary>
             Seriporu açar. (BaudRade: 921600)
             </summary>
             <param name="Com"></param>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.Close">
+        <member name="M:Optoel.SerialPort.Close">
             <summary>
             Seriportu kapatır.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.Connect">
+        <member name="M:Optoel.SerialPort.Connect">
             <summary>
             Madül ile bağlatı kurar.
             (Madülle bağlantı kurmadan önce "Open" methodu ile seriportu açın)
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.Disconnect">
+        <member name="M:Optoel.SerialPort.Disconnect">
             <summary>
             Madül ile bağlantıyı sonlandırır ama seriportu kapatmaz.
-            Madüle ile bağlantı sonlandırılırdığı takdirde, modülden veri
-            alınmaz. Configurasyon yapılamaz. Bunun için tekrar "Connect" methodu ile
+            Madül ile bağlantı sonlandırılırdığı takdirde, modülden veri
+            alınamaz. Configurasyon yapılamaz. Bunun için tekrar "Connect" methodu ile
             bağlantı kurulması gerekir.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.AccelEnable(Optoel.BMX055.Enable)">
-            <summary>
-            Accelerometer'ı aktif eder.
-            </summary>
-            <param name="enable"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.GyroEnable(Optoel.BMX055.Enable)">
-            <summary>
-            Gyroscope'u aktif eder.
-            </summary>
-            <param name="enable"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.MagnoEnable(Optoel.BMX055.Enable)">
-            <summary>
-            Magnotometer'ı aktif eder.
-            </summary>
-            <param name="enable"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.AccelSetBw(Optoel.BMX055.AccelBw)">
-            <summary>
-            Accelerometer'ın okuma frekansını ayarlar.
-            </summary>
-            <param name="accelBw"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.GyroSetBw(Optoel.BMX055.GyroBw)">
-            <summary>
-            Gyroscope'un okuma frekansını ayarlar.
-            </summary>
-            <param name="gyroBw"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.MagnoSetBw(Optoel.BMX055.MagnoBw)">
-            <summary>
-            Magnotometer'ın okuma frekansını ayarlar.
-            </summary>
-            <param name="magnoBw"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.AccelSetRange(Optoel.BMX055.AccelRange)">
-            <summary>
-            Accelerometer'ın çalışma aralığını (range) ayarlar.
-            </summary>
-            <param name="accelRange"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.GyroSetRange(Optoel.BMX055.GyroRange)">
-            <summary>
-            Gyroscope'un çalışma aralığını (range) ayarlar.
-            </summary>
-            <param name="gyroRange"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Optoel.Optoel.SerialPort.Start(Optoel.BMX055.Enable,Optoel.BMX055.Enable,Optoel.BMX055.Enable)">
+        <member name="M:Optoel.SerialPort.Start(Optoel.BMX055.Enable,Optoel.BMX055.Enable,Optoel.BMX055.Enable)">
             <summary>
             Aktif edilmiş sensörlerden, verilerin gönerilmesini başlatır.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Optoel.Optoel.SerialPort.Stop">
+        <member name="M:Optoel.SerialPort.Stop">
             <summary>
             Aktif edilmiş sönserlerden, verilerin gönderilmesini durdurur.
             </summary>
