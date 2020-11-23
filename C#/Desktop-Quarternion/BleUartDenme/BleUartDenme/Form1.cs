@@ -28,6 +28,7 @@ namespace BleUartDenme
         string QuaternionPath = @"Quternion.csv";
         string EulerPath = @"Euler.csv";
 
+
         FileStream fileStreamAccel;
         FileStream fileStreamGyro;
         FileStream fileStreamMagno;
