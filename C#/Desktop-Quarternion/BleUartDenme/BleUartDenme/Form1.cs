@@ -25,15 +25,21 @@ namespace BleUartDenme
         string gyroPath = @"Gyro.csv";
         string magnoPath = @"Magno.csv";
         string AllDataPath = @"AllData.csv";
+        string QuaternionPath = @"Quternion.csv";
+        string EulerPath = @"Euler.csv";
 
         FileStream fileStreamAccel;
         FileStream fileStreamGyro;
         FileStream fileStreamMagno;
         FileStream fileStreamAllData;
+        FileStream fileStreamQuternion;
+        FileStream fileStreamEuler;
         StreamWriter swAccel;
         StreamWriter swGyro;
         StreamWriter swMagno;
         StreamWriter swAllData;
+        StreamWriter swQuaternion;
+        StreamWriter swEuler;
 
         public Thread thread;
 
@@ -143,14 +149,21 @@ namespace BleUartDenme
             File.Delete(gyroPath);
             File.Delete(magnoPath);
             File.Delete(AllDataPath);
+            File.Delete(QuaternionPath);
+            File.Delete(EulerPath);
             fileStreamAccel = new FileStream(accelPath, FileMode.OpenOrCreate, FileAccess.Write);
             fileStreamGyro = new FileStream(gyroPath, FileMode.OpenOrCreate, FileAccess.Write);
             fileStreamMagno = new FileStream(magnoPath, FileMode.OpenOrCreate, FileAccess.Write);
             fileStreamAllData = new FileStream(AllDataPath, FileMode.OpenOrCreate, FileAccess.Write);
+            fileStreamQuternion = new FileStream(QuaternionPath, FileMode.OpenOrCreate, FileAccess.Write);
+            fileStreamEuler = new FileStream(EulerPath, FileMode.OpenOrCreate, FileAccess.Write);
             swAccel = new StreamWriter(fileStreamAccel);
             swGyro = new StreamWriter(fileStreamGyro);
             swMagno = new StreamWriter(fileStreamMagno);
             swAllData = new StreamWriter(fileStreamAllData);
+            swQuaternion = new StreamWriter(fileStreamQuternion);
+            swEuler = new StreamWriter(fileStreamEuler);
+
 
             GettingMagCompan = Settings.GetMagCompan();
 
@@ -567,14 +580,14 @@ namespace BleUartDenme
         public long minYawPitchRoll = 0, maxYawPitchRoll = 250;
 
         //Madgwick madgwick = new Madgwick(0.008f, 0.95f);
-        MadgwickAHRS madgwick = new MadgwickAHRS(0.008f, 10f);
+        MadgwickAHRS madgwick = new MadgwickAHRS(0.008f, .001f);
 
         long tick1 = 0;
         long tick2 = 0;
         float saniye = 0;
         List<float> listSaniye = new List<float>();
         BMX055.Accel accel = new BMX055.Accel(0, 0, 0, 0);
-     
+        
         private void BleAccelData(Ble.BleSlave sender, Optoel.BMX055.Accel Accel)
         {
             try
@@ -605,17 +618,32 @@ namespace BleUartDenme
                     //);
                     //swAllData.Flush();
 
-
-
                     //float accelX = accel.RawX / 1000.0f;
                     //float accelY = accel.RawY / 1000.0f;
                     //float accelZ = accel.RawZ / 1000.0f;
                     //roll = (float)(Math.Atan2(accelY, Math.Sqrt(Math.Pow(accelX, 2) + Math.Pow(accelZ, 2))) * 180 / Math.PI);
                     //pitch = (float)(Math.Atan2(-1 * accelX, Math.Sqrt(Math.Pow(accelY, 2) + Math.Pow(accelZ, 2))) * 180 / Math.PI);
 
-                    madgwick.Update(Degree2Radian(gyro.RawX), Degree2Radian(gyro.RawY), Degree2Radian(gyro.RawZ), accel.RawX, accel.RawY, accel.RawZ, -magno.RawY, magno.RawX, magno.RawZ);
+                    madgwick.Update(Degree2Radian(gyro.RawX), Degree2Radian(gyro.RawY), Degree2Radian(gyro.RawZ), accel.RawX, accel.RawY, accel.RawZ, magno.RawX, magno.RawY, magno.RawZ);
                     //madgwick.Update(Degree2Radian(gyro.RawX), Degree2Radian(gyro.RawY), Degree2Radian(gyro.RawZ), accel.RawX, accel.RawY, accel.RawZ, corrected[0], corrected[1], corrected[2]);
+                    //madgwick.Update(Degree2Radian(gyro.RawX), Degree2Radian(gyro.RawY), Degree2Radian(gyro.RawZ), -accel.RawX, -accel.RawY, accel.RawZ, magno.RawX, -magno.RawY, magno.RawZ);
+
+                    //swQuaternion.WriteLine(
+                    //    madgwick.Quaternion[0].ToString(new CultureInfo("en-US", false)) + "," +
+                    //    madgwick.Quaternion[1].ToString(new CultureInfo("en-US", false)) + "," +
+                    //    madgwick.Quaternion[2].ToString(new CultureInfo("en-US", false)) + "," +
+                    //    madgwick.Quaternion[3].ToString(new CultureInfo("en-US", false))
+                    //);
+                    //swQuaternion.Flush();
+
                     Quaternion2Euler();
+
+                    //swEuler.WriteLine(
+                    //    Radian2Degree(euler[0]).ToString(new CultureInfo("en-US", false)) + "," +
+                    //    Radian2Degree(euler[1]).ToString(new CultureInfo("en-US", false)) + "," +
+                    //    Radian2Degree(euler[2]).ToString(new CultureInfo("en-US", false))
+                    //);
+                    //swEuler.Flush();
 
                     //if (filterState == true)
                     //{
@@ -644,7 +672,7 @@ namespace BleUartDenme
                     //    maxaccelBle1++;
                     //    minaccelBle1++;
                     //}
-                    
+
                 }
                 else if (sender.SlaveNumber == 1)
                 {
@@ -820,8 +848,8 @@ namespace BleUartDenme
                     //magnoPaneBle1.AxisChange();
                     ////magnoZedGraf.Refresh();
                     //maxmagnoBle1++;
-                    //minmagnoBle1++;
-                    
+                    //minmagnoBle1++;  
+
                 }
                 else if (sender.SlaveNumber == 1)
                 {
@@ -887,7 +915,7 @@ namespace BleUartDenme
         static float pitch = 0;
         static float roll = 0;
         static float dt = 0.01f;
-        float[] euler = new float[3];
+        double[] euler = new double[3];
 
         void yaw_pitc_roll()
         {
@@ -932,24 +960,23 @@ namespace BleUartDenme
         {
             try
             {
-                float[] q = new float[4];
+                double[] q = new double[4];
                 
-
                 q[0] = madgwick.Quaternion[0];
-                q[1] = 1 * madgwick.Quaternion[1];
-                q[2] = 1 * madgwick.Quaternion[2];
-                q[3] = 1 * madgwick.Quaternion[3];
+                q[1] = -1 * madgwick.Quaternion[1];
+                q[2] = -1 * madgwick.Quaternion[2];
+                q[3] = -1 * madgwick.Quaternion[3];
 
                 #region formül1
-                float R1 = (float)((2 * Math.Pow(q[0], 2) - 1) + (2 * Math.Pow(q[1], 2)));
-                float R2 = (2 * q[1] * q[2]) - (q[0] * q[3]);
-                float R3 = (2 * q[1] * q[3]) + (q[0] * q[2]);
-                float R4 = (2 * q[2] * q[3]) - (q[0] * q[1]);
-                float R5 = (float)((2 * Math.Pow(q[0], 2) - 1) + (2 * Math.Pow(q[3], 2)));
+                double R1 = (double)((2 * Math.Pow(q[0], 2) - 1) + (2 * Math.Pow(q[1], 2)));
+                double R2 = (2 * q[1] * q[2]) - (q[0] * q[3]);
+                double R3 = (2 * q[1] * q[3]) + (q[0] * q[2]);
+                double R4 = (2 * q[2] * q[3]) - (q[0] * q[1]);
+                double R5 = (double)((2 * Math.Pow(q[0], 2) - 1) + (2 * Math.Pow(q[3], 2)));
 
-                euler[0] = (float)Math.Atan2(R4, R5);
-                euler[1] = -1 * (float)Math.Atan(R3 / Math.Sqrt(1 - Math.Pow(R3, 2)));
-                euler[2] = (float)Math.Atan2(R2, R1);
+                euler[0] = (double)Math.Atan2(R4, R5);
+                euler[1] = -1 * (double)Math.Atan(R3 / Math.Sqrt(1 - Math.Pow(R3, 2)));
+                euler[2] = (double)Math.Atan2(R2, R1);
 
                 //lbl_quat0.Text = Radian2Degree(euler[0]).ToString();
                 //lbl_quat1.Text = Radian2Degree(euler[1]).ToString();
@@ -986,10 +1013,15 @@ namespace BleUartDenme
 
                 if (count%2 == 0)
                 {
-                    quaternion0.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[0] /*Radian2Degree(euler[0])*/));
-                    quaternion1.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[1] /*Radian2Degree(euler[1])*/));
-                    quaternion2.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[2] /*Radian2Degree(euler[2])*/));
-                    quaternion3.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[3]));
+                    quaternion0.Add(new ZedGraph.PointPair(maxYawPitchRoll, Radian2Degree(euler[0])));
+                    quaternion1.Add(new ZedGraph.PointPair(maxYawPitchRoll, Radian2Degree(euler[1])));
+                    quaternion2.Add(new ZedGraph.PointPair(maxYawPitchRoll, Radian2Degree(euler[2])));
+
+                    //quaternion0.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[0]));
+                    //quaternion1.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[1]));
+                    //quaternion2.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[2]));
+                    //quaternion3.Add(new ZedGraph.PointPair(maxYawPitchRoll, q[3]));
+
                     gyroPane.XAxis.Scale.Max = maxYawPitchRoll;
                     gyroPane.XAxis.Scale.Min = minYawPitchRoll;
 
@@ -1129,6 +1161,12 @@ namespace BleUartDenme
         {
             return (float)((180.0f / Math.PI) * rad);
         }
+
+        double Radian2Degree(double rad)
+        {
+            return (double)((180.0f / Math.PI) * rad);
+        }
+
 
         float Degree2Radian(float deg)
         {
